@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/horizontal_timebar_view"
+        android:fillViewport="true">
+        <LinearLayout
+            android:id="@+id/mainTimeBarView"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:orientation="horizontal"
+            >
+            <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button One"
+                android:visibility="visible"/>
+            <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button Two"
+                android:visibility="visible"/>
+            <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button Three"
+                android:visibility="visible"/>
+            <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button Four"
+                android:visibility="visible"/>
+            <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button Five"
+                android:visibility="visible"/>
+            <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button Six"
+                android:visibility="visible"/>
+            <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button Seven"
+                android:visibility="visible"/>
+            <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button Eight"
+                android:visibility="visible"/>
+            <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button Nine"
+                android:visibility="visible"/>
+            <Button android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Button Ten"
+                android:visibility="visible"/>
+
+
+        </LinearLayout>
+    </HorizontalScrollView>
+</LinearLayout>

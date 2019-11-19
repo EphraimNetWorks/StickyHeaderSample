@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">TestApplication</string>
+    <string name="app_theme_pref_key">app_theme_pref</string>
+
+    <string name="theme_pref_automatic">Automatic</string>
+
+    <string name="theme_pref_light">Light</string>
+
+    <string name="theme_pref_dark">Dark</string>
+    <string name="theme_pref_summary">Select from a variety of beautiful app themes to suit your taste</string>
+    <string name="theme_pref_title">Select App theme</string>
+
+    <string-array name="theme_pref_values">
+        <item>Automatic</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+
+</resources>
