@@ -35,7 +35,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
-public class UpcomingGuestListAdapter extends StickHeaderRecyclerView<UpcomingGuest, HeaderDataImpl>
+public class UpcomingGuestListAdapter extends StickyHeaderAdapter<UpcomingGuest, HeaderDataImpl>
         implements RecyclerDataCallback<UpcomingGuest>{
 
     private UpcomingGuestListAdapter.Callback mCallback;
@@ -59,6 +59,9 @@ public class UpcomingGuestListAdapter extends StickHeaderRecyclerView<UpcomingGu
     public BaseViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         switch (viewType) {
+            //empty header for empty view holder
+            case EmptyHeaderDataImpl.EMPTY_HEADER:
+                return new EmptyHeaderViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_empty_sticky_header, parent, false));
             case HeaderDataImpl.HEADER:
                 return new HeaderViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_sticky_header, parent, false));
 
@@ -108,17 +111,19 @@ public class UpcomingGuestListAdapter extends StickHeaderRecyclerView<UpcomingGu
         // this method is called when your header move and you must not only bind header data in HeaderViewHolder
         //but also bind header data here.
 
-        TextView headerTitleTextView = header.findViewById(R.id.sticky_header_title);
-        headerTitleTextView.setText(getHeaderDataInPosition(headerPosition).getHeaderTitle());
+        if (!(hasExtraRow() && headerPosition == getItemCount() - 2)) {
+            TextView headerTitleTextView = header.findViewById(R.id.sticky_header_title);
+            headerTitleTextView.setText(getHeaderDataInPosition(headerPosition).getHeaderTitle());
+        }
 
     }
 
     @Override
     protected int getViewType(int pos) {
-        if (getItemCount() > 0) {
-            return VIEW_TYPE_NORMAL;
-        } else {
+        if (hasExtraRow() && pos == getItemCount() - 1) {
             return VIEW_TYPE_EMPTY;
+        } else {
+            return VIEW_TYPE_NORMAL;
         }
     }
 

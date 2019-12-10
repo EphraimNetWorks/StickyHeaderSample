@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,8 +34,48 @@ public class StickyDateActivity extends AppCompatActivity implements UpcomingGue
         mUpcomingGuestAdapter = new UpcomingGuestListAdapter(this);
         mRecyclerView.setAdapter(mUpcomingGuestAdapter);
 
-        addData(getDayReservationsList(getSampleResponse()));
+        //mimicking scenarios
+        mimickFailSucceedCall();
+        //mimicSucceedFailSucceedCall();
 
+    }
+
+    private void mimickFailSucceedCall(){
+        //network call failed
+        mUpcomingGuestAdapter.showEmptyViewHolder(true);
+
+        //succeed after 5 seconds
+        new Handler().postDelayed(() -> {
+
+            //network call success
+            mUpcomingGuestAdapter.showEmptyViewHolder(false);
+            addData(getDayReservationsList(getSampleResponse()));
+
+        },5000);
+    }
+
+    private void mimickSucceedFailSucceedCall(){
+        //network call success
+        addData(getDayReservationsList(getSampleResponse()));
+        mRecyclerView.smoothScrollToPosition(mUpcomingGuestAdapter.getItemCount());
+
+        // fail after 5 seconds
+        new Handler().postDelayed(() -> {
+
+            //network call failed
+            mUpcomingGuestAdapter.showEmptyViewHolder(true);
+            mRecyclerView.smoothScrollToPosition(mUpcomingGuestAdapter.getItemCount());
+
+            //succeed after another 5 seconds
+            new Handler().postDelayed(() -> {
+
+                //network call success
+                mUpcomingGuestAdapter.showEmptyViewHolder(false);
+                addData(getDayReservationsList(getSampleResponse()));
+
+            },5000);
+
+        },5000);
     }
 
 
@@ -43,7 +84,8 @@ public class StickyDateActivity extends AppCompatActivity implements UpcomingGue
             HeaderDataImpl headerData1 = new HeaderDataImpl(HeaderDataImpl.HEADER,
                     R.layout.item_sticky_header,dayReservations.getDayDate());
 
-            mUpcomingGuestAdapter.setHeaderAndData(dayReservations.getUpcomingGuests(), headerData1);
+            //notice addHeaderAndData is being used instead of setHeaderAndData
+            mUpcomingGuestAdapter.addHeaderAndData(dayReservations.getUpcomingGuests(), headerData1);
         }
 
     }
