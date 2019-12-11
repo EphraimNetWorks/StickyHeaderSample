@@ -1,6 +1,4 @@
-package com.networks.testapplication;
-
-import java.util.TimeZone;
+package com.networks.testapplication.utils;
 
 public class AppPreferencesHelper {
 

@@ -1,8 +1,6 @@
-package com.networks.testapplication;
+package com.networks.testapplication.data;
 
 import androidx.annotation.Nullable;
-
-import com.saber.stickyheader.stickyData.StickyMainData;
 
 import java.util.ArrayList;
 

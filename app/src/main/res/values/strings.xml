@@ -31,5 +31,11 @@
     <string name="no_upcoming_guests">No Upcoming Guests</string>
     <string name="no_internet">No Internet</string>
     <string name="no_internet_body">No internet body</string>
+    <string name="unknown_error">unknown error</string>
+    <string name="no_items_found">No items found</string>
+    <string name="no_event_found_title">No events found</string>
+    <string name="no_event_found_body">No events were found</string>
+    <string name="no_guests_found_title">No guests found</string>
+    <string name="no_guests_found_body">No guests were found</string>
 
 </resources>

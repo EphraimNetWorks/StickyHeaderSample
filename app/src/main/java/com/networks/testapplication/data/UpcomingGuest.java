@@ -1,11 +1,6 @@
-package com.networks.testapplication;
+package com.networks.testapplication.data;
 
 import com.saber.stickyheader.stickyData.StickyMainData;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 public class UpcomingGuest implements StickyMainData {
     

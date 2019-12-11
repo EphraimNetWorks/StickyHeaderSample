@@ -1,4 +1,4 @@
-package com.networks.testapplication;
+package com.networks.testapplication.ui.adapters_viewholders;
 
 import android.view.View;
 

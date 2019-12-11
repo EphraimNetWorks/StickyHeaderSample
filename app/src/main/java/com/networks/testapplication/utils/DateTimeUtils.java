@@ -1,4 +1,4 @@
-package com.networks.testapplication;
+package com.networks.testapplication.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

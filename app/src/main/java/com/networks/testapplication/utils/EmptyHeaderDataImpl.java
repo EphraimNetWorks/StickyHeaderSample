@@ -1,7 +1,8 @@
-package com.networks.testapplication;
+package com.networks.testapplication.utils;
 
 import androidx.annotation.LayoutRes;
 
+import com.networks.testapplication.R;
 import com.saber.stickyheader.stickyData.HeaderData;
 
 public class EmptyHeaderDataImpl implements HeaderData {

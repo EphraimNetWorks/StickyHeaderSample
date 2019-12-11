@@ -1,42 +1,29 @@
-package com.networks.testapplication;
+package com.networks.testapplication.ui.adapters_viewholders;
 
-import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.icu.text.SimpleDateFormat;
-import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.AppCompatButton;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.saber.stickyheader.stickyView.StickHeaderRecyclerView;
-
-import java.text.ParseException;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
+import com.networks.testapplication.R;
+import com.networks.testapplication.data.UpcomingGuest;
+import com.networks.testapplication.utils.EmptyHeaderViewHolder;
+import com.networks.testapplication.utils.EmptyHeaderDataImpl;
+import com.networks.testapplication.utils.NetworkState;
+import com.networks.testapplication.utils.NetworkStateCallback;
+import com.networks.testapplication.utils.RefreshCallback;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
 public class UpcomingGuestListAdapter extends StickyHeaderAdapter<UpcomingGuest, HeaderDataImpl>
-        implements RecyclerDataCallback<UpcomingGuest>{
+        implements RecyclerDataCallback<UpcomingGuest>, RefreshCallback, NetworkStateCallback {
 
     private UpcomingGuestListAdapter.Callback mCallback;
     private static final int VIEW_TYPE_EMPTY = 0;
@@ -52,6 +39,16 @@ public class UpcomingGuestListAdapter extends StickyHeaderAdapter<UpcomingGuest,
     public UpcomingGuest getItemDataInPosition(int position) {
 
         return getDataInPosition(position);
+    }
+
+    @Override
+    public NetworkState getNetworkState() {
+        return mNetworkState;
+    }
+
+    @Override
+    public void refreshList() {
+        mCallback.refreshGuestList();
     }
 
     @NonNull
@@ -73,22 +70,10 @@ public class UpcomingGuestListAdapter extends StickyHeaderAdapter<UpcomingGuest,
 
             case VIEW_TYPE_EMPTY:
                 Timber.d("empty view");
-                if (getItemCount() > 1) {
-                    return new EmptyViewHolder(
-                            LayoutInflater.from(parent.getContext()).inflate(R.layout.item_skeleton_upcoming_guests, parent, false),
-                            mCallback
-                    );
-                } else {
-                    return new EmptyViewHolder(
-                            LayoutInflater.from(parent.getContext()).inflate(R.layout.item_empty_upcoming_guest_view, parent, false),
-                            mCallback
-                    );
-                }
+                return NetworkStateViewHolder.create(parent,this, this);
 
             default:
-                EmptyViewHolder emptyViewHolder = new EmptyViewHolder(LayoutInflater.from(parent.getContext()).inflate(R.layout.item_skeleton_upcoming_guests, parent, false), mCallback);
-                emptyViewHolder.setIsRecyclable(false);
-                return emptyViewHolder;
+                throw new IllegalArgumentException("Unknown view type: "+viewType);
         }
     }
 

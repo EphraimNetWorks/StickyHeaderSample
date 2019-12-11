@@ -1,4 +1,4 @@
-package com.networks.testapplication;
+package com.networks.testapplication.utils;
 
 import android.content.Context;
 

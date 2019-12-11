@@ -1,4 +1,4 @@
-package com.networks.testapplication;
+package com.networks.testapplication.ui.adapters_viewholders;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -7,6 +7,10 @@ import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+
+import com.networks.testapplication.R;
+import com.networks.testapplication.data.UpcomingGuest;
+import com.networks.testapplication.utils.AppPreferencesHelper;
 
 import java.text.ParseException;
 import java.time.OffsetDateTime;
@@ -20,7 +24,7 @@ import java.util.TimeZone;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
-public class MyViewHolder extends BaseViewHolder{
+public class MyViewHolder extends BaseViewHolder {
     public TextView name, email, arrivalDate, shortNoticeButton, cancelButton;
 
 

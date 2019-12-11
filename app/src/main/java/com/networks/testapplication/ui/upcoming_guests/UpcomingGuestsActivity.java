@@ -1,23 +1,31 @@
-package com.networks.testapplication;
+package com.networks.testapplication.ui.upcoming_guests;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.coordinatorlayout.widget.CoordinatorLayout;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 
+import com.networks.testapplication.R;
+import com.networks.testapplication.data.UpcomingGuest;
+import com.networks.testapplication.data.UpcomingGuestsList;
+import com.networks.testapplication.data.Visitor;
+import com.networks.testapplication.data.DayReservations;
+import com.networks.testapplication.data.Meeting;
+import com.networks.testapplication.ui.adapters_viewholders.HeaderDataImpl;
+import com.networks.testapplication.ui.adapters_viewholders.UpcomingGuestListAdapter;
+import com.networks.testapplication.utils.DateTimeUtils;
+import com.networks.testapplication.utils.NetworkState;
+
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class StickyDateActivity extends AppCompatActivity implements UpcomingGuestListAdapter.Callback {
+public class UpcomingGuestsActivity extends AppCompatActivity implements UpcomingGuestListAdapter.Callback {
 
     @BindView(R.id.upcoming_guests_recycler_view)
     RecyclerView mRecyclerView;
@@ -35,47 +43,97 @@ public class StickyDateActivity extends AppCompatActivity implements UpcomingGue
         mRecyclerView.setAdapter(mUpcomingGuestAdapter);
 
         //mimicking scenarios
-        mimickFailSucceedCall();
-        //mimicSucceedFailSucceedCall();
+        //mimickFailRetryEmptyResponseCall();
+        //mimickFailRetrySucceedCall();
+        mimicSucceedRunFailRunSucceedCall();
 
     }
 
-    private void mimickFailSucceedCall(){
+    private void mimickFailRetryEmptyResponseCall(){
         //network call failed
-        mUpcomingGuestAdapter.showEmptyViewHolder(true);
+        mUpcomingGuestAdapter.setNetworkState(NetworkState.error(true, R.string.no_internet,R.string.no_internet_body));
 
-        //succeed after 5 seconds
+        //run after 3 seconds
         new Handler().postDelayed(() -> {
 
             //network call success
-            mUpcomingGuestAdapter.showEmptyViewHolder(false);
-            addData(getDayReservationsList(getSampleResponse()));
+            mUpcomingGuestAdapter.setNetworkState(NetworkState.loading(true));
 
-        },5000);
-    }
-
-    private void mimickSucceedFailSucceedCall(){
-        //network call success
-        addData(getDayReservationsList(getSampleResponse()));
-        mRecyclerView.smoothScrollToPosition(mUpcomingGuestAdapter.getItemCount());
-
-        // fail after 5 seconds
-        new Handler().postDelayed(() -> {
-
-            //network call failed
-            mUpcomingGuestAdapter.showEmptyViewHolder(true);
-            mRecyclerView.smoothScrollToPosition(mUpcomingGuestAdapter.getItemCount());
-
-            //succeed after another 5 seconds
+            //succeed after 5 seconds
             new Handler().postDelayed(() -> {
 
                 //network call success
-                mUpcomingGuestAdapter.showEmptyViewHolder(false);
+
+                mUpcomingGuestAdapter.setNetworkState(NetworkState.loaded(true,R.drawable.ic_guests,R.string.no_guests_found_title, R.string.no_guests_found_body));
+                //addData(getDayReservationsList(getSampleResponse()));
+
+            },5000);
+
+        },3000);
+    }
+
+    private void mimickFailRetrySucceedCall(){
+        //network call failed
+        mUpcomingGuestAdapter.setNetworkState(NetworkState.error(true, R.string.no_internet,R.string.no_internet_body));
+
+        //run after 3 seconds
+        new Handler().postDelayed(() -> {
+
+            //network call success
+            mUpcomingGuestAdapter.setNetworkState(NetworkState.loading(true));
+
+            //succeed after 5 seconds
+            new Handler().postDelayed(() -> {
+
+                //network call success
+
+                mUpcomingGuestAdapter.setNetworkState(NetworkState.loaded());
                 addData(getDayReservationsList(getSampleResponse()));
 
             },5000);
 
-        },5000);
+        },3000);
+    }
+
+    private void mimicSucceedRunFailRunSucceedCall(){
+        //network call succeeded
+        mUpcomingGuestAdapter.setNetworkState(NetworkState.loaded());
+        addData(getDayReservationsList(getSampleResponse()));
+        mRecyclerView.smoothScrollToPosition(mUpcomingGuestAdapter.getItemCount());
+
+        //show loading after 3 seconds
+        new Handler().postDelayed(() -> {
+
+            //network call loading
+            mUpcomingGuestAdapter.setNetworkState(NetworkState.loading(false));
+            mRecyclerView.smoothScrollToPosition(mUpcomingGuestAdapter.getItemCount());
+
+            //fail after 5 seconds
+            new Handler().postDelayed(() -> {
+
+                //network call failed
+                mUpcomingGuestAdapter.setNetworkState(NetworkState.error(false,R.string.no_internet, R.string.no_internet_body));
+
+                //show loading after 3 seconds
+                new Handler().postDelayed(() -> {
+
+                    //network call loading
+                    mUpcomingGuestAdapter.setNetworkState(NetworkState.loading(false));
+                    mRecyclerView.smoothScrollToPosition(mUpcomingGuestAdapter.getItemCount());
+
+                    //succeed after 5 seconds
+                    new Handler().postDelayed(() -> {
+
+                        //network call success
+                        mUpcomingGuestAdapter.setNetworkState(NetworkState.loaded());
+                        addData(getDayReservationsList(getSampleResponse()));
+
+                    },5000);
+
+                },3000);
+            },5000);
+
+        },3000);
     }
 
 

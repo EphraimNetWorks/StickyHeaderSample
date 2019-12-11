@@ -1,7 +1,8 @@
-package com.networks.testapplication;
+package com.networks.testapplication.data;
 
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
+import com.networks.testapplication.data.Meeting;
 
 import java.util.List;
 

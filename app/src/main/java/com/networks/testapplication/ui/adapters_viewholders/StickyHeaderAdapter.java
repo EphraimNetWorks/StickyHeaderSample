@@ -1,9 +1,13 @@
-package com.networks.testapplication;
+package com.networks.testapplication.ui.adapters_viewholders;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.networks.testapplication.R;
+import com.networks.testapplication.utils.EmptyHeaderDataImpl;
+import com.networks.testapplication.utils.NetworkState;
+import com.networks.testapplication.utils.Status;
 import com.saber.stickyheader.stickyData.HeaderData;
 import com.saber.stickyheader.stickyData.StickyMainData;
 import com.saber.stickyheader.stickyView.StickHeaderItemDecoration;
@@ -11,9 +15,10 @@ import com.saber.stickyheader.stickyView.StickHeaderItemDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public abstract class StickyHeaderAdapter<D extends StickyMainData, H extends HeaderData> extends RecyclerView.Adapter implements StickHeaderItemDecoration.StickyHeaderInterface{
     private List<StickyMainData> mData = new ArrayList<>();
-    private boolean showEmptyView = false;
+    protected NetworkState mNetworkState ;
 
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -74,19 +79,22 @@ public abstract class StickyHeaderAdapter<D extends StickyMainData, H extends He
     /*
     *Show empty viewholder
      */
-    public void showEmptyViewHolder(boolean newShowEmptyView){
+    public void setNetworkState(NetworkState newNetworkState) {
 
+        NetworkState previousState = mNetworkState;
+        boolean hadExtraRow = hasExtraRow();
+        mNetworkState = newNetworkState;
 
-        boolean previousShowEmptyView = showEmptyView;
+        boolean hasExtraRow = hasExtraRow();
 
-        showEmptyView = newShowEmptyView;
-
-        if (previousShowEmptyView != newShowEmptyView) {
-            if (previousShowEmptyView) {
+        if (hadExtraRow != hasExtraRow) {
+            if (hadExtraRow) {
                 notifyItemRangeRemoved(getItemCount(),2);
             } else {
                 notifyItemRangeInserted(getItemCount(),2);
             }
+        } else if (hasExtraRow && previousState != newNetworkState) {
+            notifyItemChanged(getItemCount() - 1);
         }
     }
 
@@ -116,7 +124,9 @@ public abstract class StickyHeaderAdapter<D extends StickyMainData, H extends He
         mData.addAll(datas);
     }
 
-    protected boolean hasExtraRow(){return showEmptyView;}
+    protected boolean hasExtraRow() {
+        return mNetworkState != null && (mNetworkState.getStatus() != Status.SUCCESS || mNetworkState.isResponseEmpty());
+    }
 
     protected int getViewType(int pos){
         return 0;
