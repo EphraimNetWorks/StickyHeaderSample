@@ -75,4 +75,9 @@ dependencies {
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.2.0'
     implementation 'com.jakewharton.timber:timber:4.7.1'
     implementation 'com.saber:stickyheader:1.0'
+
+
+    implementation 'com.github.prolificinteractive:material-calendarview:2.0.1'
+    // Time library
+    implementation 'com.jakewharton.threetenabp:threetenabp:1.2.0'
 }
