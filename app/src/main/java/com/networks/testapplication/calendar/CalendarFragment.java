@@ -64,14 +64,6 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
         calendarView.setDateTextAppearance(View.ACCESSIBILITY_LIVE_REGION_ASSERTIVE);
 
         calendarView.setSelectedDate(LocalDate.now());
-        calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
-            @Override
-            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
-                calendarView.setHeaderTextAppearance(R.style.AppTheme);
-            }
-        });
-
-
 
         calendarView.setOnDateChangedListener(this);
 
@@ -154,6 +146,9 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
 
     @Override
     public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+
+        calendarView.setHeaderTextAppearance(R.style.AppTheme);
+
         List<Event> event =  map.get(date);
         if(event!=null && event.size()>0) {
             adapter.addItems(event);
