@@ -56,7 +56,7 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
         calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
-                mRecyclerView.smoothScrollToPosition(getDatePosition(date));
+                ((LinearLayoutManager) mRecyclerView.getLayoutManager()).scrollToPositionWithOffset(getDatePosition(date)+1,0);
             }
         });
 

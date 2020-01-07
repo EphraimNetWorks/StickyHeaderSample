@@ -37,4 +37,19 @@ public class DateTimeUtils {
         return LocalDate.parse(dateString, org.threeten.bp.format.DateTimeFormatter.ofPattern(fromFormat,Locale.US));
 
     }
+
+    public static String formatDate(int year, int month, int day){
+        String dateString = "" ;
+        try {
+
+            String str_date= year+"-"+month+"-"+day;
+            SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd",Locale.US);
+            Date date = formatter.parse(str_date);
+            SimpleDateFormat formatter2 = new SimpleDateFormat("EEEE, MMMM dd",Locale.US);
+            dateString = formatter2.format(date.getTime());
+        }catch (ParseException e){
+            Timber.e(e);
+        }
+        return dateString;
+    }
 }
