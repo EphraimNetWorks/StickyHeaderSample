@@ -18,11 +18,14 @@ import com.networks.testapplication.utils.NetworkState;
 import com.networks.testapplication.utils.NetworkStateCallback;
 import com.networks.testapplication.utils.RefreshCallback;
 
+import org.threeten.bp.LocalDate;
+import org.threeten.bp.format.DateTimeFormatter;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import timber.log.Timber;
 
-public class UpcomingEventListAdapter extends StickyHeaderAdapter<UpcomingEvent, HeaderDataImpl>
+public class UpcomingEventListAdapter extends StickyHeaderAdapter<UpcomingEvent, DateHeaderDataImpl>
         implements RecyclerDataCallback<UpcomingEvent>, RefreshCallback, NetworkStateCallback {
 
     private UpcomingEventListAdapter.Callback mCallback;
@@ -98,7 +101,10 @@ public class UpcomingEventListAdapter extends StickyHeaderAdapter<UpcomingEvent,
 
         if (!(hasExtraRow() && headerPosition == getItemCount() - 2)) {
             TextView headerTitleTextView = header.findViewById(R.id.sticky_header_title);
-            headerTitleTextView.setText(getHeaderDataInPosition(headerPosition).getHeaderTitle());
+            DateHeaderDataImpl headerData = getHeaderDataInPosition(headerPosition);
+            String dateString = headerData.getHeaderDate().format(DateTimeFormatter.ofPattern("EEEE MMMM dd"));
+            headerTitleTextView.setText(dateString.toUpperCase());
+            mCallback.onHeaderMoved(headerData.getHeaderDate());
         }
 
     }
@@ -116,6 +122,7 @@ public class UpcomingEventListAdapter extends StickyHeaderAdapter<UpcomingEvent,
         void onItemClick(String eventId);
         public void showDialog(int title, int body, int positiveText, DialogInterface.OnClickListener positiveListener, int negativeText, DialogInterface.OnClickListener negativeListener, Object o);
         void refreshEventList();
+        void onHeaderMoved(LocalDate date);
 
     }
 
@@ -137,8 +144,9 @@ public class UpcomingEventListAdapter extends StickyHeaderAdapter<UpcomingEvent,
         void onBind(int position) {
             super.onBind(position);
 
-            HeaderDataImpl headerData = getHeaderDataInPosition(position);
-            messageTextView.setText(headerData.getHeaderTitle());
+            DateHeaderDataImpl headerData = getHeaderDataInPosition(position);
+            String dateString = headerData.getHeaderDate().format(DateTimeFormatter.ofPattern("EEEE MMMM dd"));
+            messageTextView.setText(dateString.toUpperCase());
         }
 
         @Override

@@ -41,11 +41,8 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
 
 
     private MaterialCalendarView calendarView;
-    private List<CalendarDay> calevents = new ArrayList<>();
-    private List<Event> eventList = new ArrayList<>();
     private HashMap<CalendarDay,List<Event>> map = new HashMap<>();
     private ListView listView;
-    private TextView noEventsTextView;
     private MyAdapter adapter;
 
 
@@ -55,9 +52,8 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
         View view = inflater.inflate(R.layout.calendar, container, false);
 
         listView = view.findViewById(R.id.listview);
-        noEventsTextView = view.findViewById(R.id.empty_results_textview);
 
-        adapter = new MyAdapter(getActivity(),eventList);
+        adapter = new MyAdapter(getActivity(),new ArrayList<Event>());
         listView.setAdapter(adapter);
 
         calendarView =  view.findViewById(R.id.calendarView);
@@ -105,7 +101,6 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
 
                 }
 
-                calevents.add(day);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -115,14 +110,12 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
         List<Event> event =  map.get(CalendarDay.from(LocalDate.now()));
         if(event!=null && event.size()>0) {
             adapter.addItems(event);
-            noEventsTextView.setVisibility(View.GONE);
         }else {
             adapter.clear();
-            noEventsTextView.setVisibility(View.VISIBLE);
         }
 
         //add small dots on event days
-        EventDecorator eventDecorator = new EventDecorator(Color.RED, calevents);
+        EventDecorator eventDecorator = new EventDecorator(Color.RED, map.keySet());
         calendarView.addDecorator(eventDecorator);
 
 
@@ -152,10 +145,8 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
         List<Event> event =  map.get(date);
         if(event!=null && event.size()>0) {
             adapter.addItems(event);
-            noEventsTextView.setVisibility(View.GONE);
         }else {
             adapter.clear();
-            noEventsTextView.setVisibility(View.VISIBLE);
         }
     }
 

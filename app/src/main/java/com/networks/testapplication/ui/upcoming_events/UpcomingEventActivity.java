@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.networks.testapplication.R;
 import com.networks.testapplication.data.DayEventReservations;
 import com.networks.testapplication.data.UpcomingEvent;
+import com.networks.testapplication.ui.adapters_viewholders.DateHeaderDataImpl;
 import com.networks.testapplication.ui.adapters_viewholders.HeaderDataImpl;
 import com.networks.testapplication.ui.adapters_viewholders.UpcomingEventListAdapter;
 import com.networks.testapplication.utils.DateTimeUtils;
@@ -23,6 +24,8 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import org.threeten.bp.LocalDate;
+import org.threeten.bp.format.DateTimeFormatter;
+import org.threeten.bp.format.TextStyle;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -35,11 +38,10 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
 
     @BindView(R.id.upcoming_guests_recycler_view)
     RecyclerView mRecyclerView;
-    @BindView(R.id.calendarView)
-    MaterialCalendarView calendarView;
+    @BindView(R.id.month_name_textview)
+    TextView monthNameTextView;
 
     UpcomingEventListAdapter mUpcomingEventAdapter;
-    ScrollDirection mRecyclerScrollDirection;
 
     ArrayList<DayEventReservations> mDayEventReservationsArrayList;
 
@@ -52,131 +54,31 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
         mUpcomingEventAdapter = new UpcomingEventListAdapter(this);
         mRecyclerView.setAdapter(mUpcomingEventAdapter);
 
-
-        calendarView.setOnDateChangedListener(new OnDateSelectedListener() {
-            @Override
-            public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
-                ((LinearLayoutManager) mRecyclerView.getLayoutManager()).scrollToPositionWithOffset(getDatePosition(date)+1,0);
-            }
-        });
-
-        mRecyclerView.addOnChildAttachStateChangeListener(new RecyclerView.OnChildAttachStateChangeListener() {
-            @Override
-            public void onChildViewAttachedToWindow(View view) {
-                if(mRecyclerScrollDirection!=null && mRecyclerScrollDirection == ScrollDirection.SCROLLING_DOWN){
-                    TextView headerView = view.findViewById(R.id.sticky_header_title);
-                    if (headerView != null) {
-
-                        String dateString = headerView.getText().toString().split("\\(")[0].trim();
-
-                        setReservationDateInCalendarView(getReservationDatePriorTo(dateString));
-                    }
-                }
-            }
-
-            @Override
-            public void onChildViewDetachedFromWindow(View view) {
-
-                if(mRecyclerScrollDirection!=null && mRecyclerScrollDirection == ScrollDirection.SCROLLING_UP){
-                    TextView headerView = view.findViewById(R.id.sticky_header_title);
-                    if (headerView != null) {
-
-                        String dateString = headerView.getText().toString().split("\\(")[0].trim();
-                        LocalDate date = DateTimeUtils.convertToLocalDate(dateString, "MMM dd,yyyy");
-
-                        setReservationDateInCalendarView(date);
-                    }
-                }
-            }
-        });
-
-        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                super.onScrolled(recyclerView, dx, dy);
-                if (dy > 0) {
-                    // Scrolling up
-                    mRecyclerScrollDirection = ScrollDirection.SCROLLING_UP;
-                } else {
-                    // Scrolling down
-                    mRecyclerScrollDirection = ScrollDirection.SCROLLING_DOWN;
-                }
-            }
-
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-                super.onScrollStateChanged(recyclerView, newState);
-
-            }
-        });
-
         //mimick scenarios
         mimickSucceedCall();
 
     }
 
-    private LocalDate getReservationDatePriorTo(String dateString){
-        for(int index=0; index<mDayEventReservationsArrayList.size(); index++){
-            String reservationDate = mDayEventReservationsArrayList.get(index).getDayDate();
-            if(dateString.equals(reservationDate) ){
-                if(index-1<0)
-                    return DateTimeUtils.convertToLocalDate(reservationDate,"MMM dd,yyyy");
-                else
-                    reservationDate = mDayEventReservationsArrayList.get(index-1).getDayDate();
-                    return DateTimeUtils.convertToLocalDate(reservationDate,"MMM dd,yyyy");
-            }
+    private void checkAndUpdateReservationMonth(LocalDate date){
+
+        String currentMonth = monthNameTextView.getText().toString();
+        String newMonth =  date.getMonth().getDisplayName(TextStyle.FULL, Locale.US).toUpperCase();
+
+        if(!currentMonth.equals(newMonth)){
+            monthNameTextView.setText(newMonth);
         }
-
-        String reservationDate = mDayEventReservationsArrayList.get(0).getDayDate();
-        return DateTimeUtils.convertToLocalDate(reservationDate,"MMM dd,yyyy");
-    }
-
-    private void setReservationDateInCalendarView(LocalDate date){
-
-            calendarView.setCurrentDate(date);
-            calendarView.setSelectedDate(date);
     }
 
 
     private void addData(ArrayList<DayEventReservations> data) {
         for (DayEventReservations dayEventReservations: data) {
-            String headerTitle = String.format(Locale.ENGLISH,"%s (%d EVENTS)",
-                    dayEventReservations.getDayDate(),dayEventReservations.getUpcomingEvents().size());
 
-            HeaderDataImpl headerData1 = new HeaderDataImpl(HeaderDataImpl.HEADER,
-                    R.layout.item_sticky_header,headerTitle);
+            DateHeaderDataImpl headerData1 = new DateHeaderDataImpl(HeaderDataImpl.HEADER,
+                    R.layout.item_sticky_header,dayEventReservations.getDayDate());
 
             mUpcomingEventAdapter.addHeaderAndData(dayEventReservations.getUpcomingEvents(), headerData1);
         }
 
-    }
-
-
-    private int getDatePosition(CalendarDay date){
-        int index = 0;
-        for(DayEventReservations dayEventReservations: mDayEventReservationsArrayList){
-            CalendarDay calendarDay = CalendarDay.from(DateTimeUtils.convertToLocalDate(dayEventReservations.getDayDate(), "MMM dd,yyyy"));
-
-            if(date.getYear() < calendarDay.getYear()){
-                return index;
-            }else {
-                if(date.getMonth() < calendarDay.getMonth() ){
-                    return index;
-                }else if (date.getMonth() == calendarDay.getMonth()) {
-                    if(date.getDay() <= calendarDay.getDay()){
-                        return index;
-                    }else {
-                        index+= dayEventReservations.getUpcomingEvents().size();
-                    }
-                }else {
-                    index+= dayEventReservations.getUpcomingEvents().size();
-                }
-            }
-
-            index++;
-        }
-        return  index;
     }
 
     private void mimickSucceedCall(){
@@ -186,10 +88,7 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
         mDayEventReservationsArrayList = getDayEventReservationsList(getSampleResponse());
         addData(mDayEventReservationsArrayList);
 
-        LocalDate date = DateTimeUtils.convertToLocalDate(mDayEventReservationsArrayList.get(0).getDayDate(),
-                "MMM dd,yyyy");
-
-        setReservationDateInCalendarView(date);
+        checkAndUpdateReservationMonth(mDayEventReservationsArrayList.get(0).getDayDate());
 
     }
 
@@ -207,12 +106,11 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
 
         for(UpcomingEvent upcomingEvent: upcomingEventsResponse){
 
-            // convert start date(with time) to day date(without time)
-            String meetingDayDate = DateTimeUtils.convertDate(upcomingEvent.getStart(),
-                    "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", "MMM dd,yyyy");
+            // convert start date(with time) to local date
+            LocalDate date = LocalDate.parse(upcomingEvent.getStart(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
 
             //add new day to dayReservationsList if it doesn't exist
-            DayEventReservations dayEventReservations = new DayEventReservations(meetingDayDate);
+            DayEventReservations dayEventReservations = new DayEventReservations(date);
             dayEventReservations.setUpcomingEvents(new ArrayList<>());
             if(!dayEventReservationsList.contains(dayEventReservations)){
                 dayEventReservationsList.add(dayEventReservations);
@@ -240,13 +138,13 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
         sampleDates.add("2019-12-09T15:25:36.000Z");
         sampleDates.add("2019-12-12T15:25:36.000Z");
         sampleDates.add("2019-12-13T15:25:36.000Z");
-        sampleDates.add("2019-12-15T15:25:36.000Z");
-        sampleDates.add("2019-12-19T15:25:36.000Z");
-        sampleDates.add("2019-12-21T15:25:36.000Z");
-        sampleDates.add("2019-12-22T15:25:36.000Z");
-        sampleDates.add("2019-12-24T15:25:36.000Z");
-        sampleDates.add("2019-12-30T15:25:36.000Z");
-        sampleDates.add("2019-12-31T15:25:36.000Z");
+        sampleDates.add("2020-01-15T15:25:36.000Z");
+        sampleDates.add("2020-01-19T15:25:36.000Z");
+        sampleDates.add("2020-01-21T15:25:36.000Z");
+        sampleDates.add("2020-01-22T15:25:36.000Z");
+        sampleDates.add("2020-02-24T15:25:36.000Z");
+        sampleDates.add("2020-03-30T15:25:36.000Z");
+        sampleDates.add("2020-03-31T15:25:36.000Z");
 
         ArrayList<UpcomingEvent> upcomingGuestsList = new ArrayList<>();
 
@@ -286,8 +184,11 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
 
     }
 
-    enum ScrollDirection{
-        SCROLLING_UP, SCROLLING_DOWN
+    @Override
+    public void onHeaderMoved(LocalDate date) {
+
+        checkAndUpdateReservationMonth(date);
     }
+
 }
 
