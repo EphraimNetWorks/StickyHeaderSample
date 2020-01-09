@@ -102,9 +102,9 @@ public class UpcomingEventListAdapter extends StickyHeaderAdapter<UpcomingEvent,
         if (!(hasExtraRow() && headerPosition == getItemCount() - 2)) {
             TextView headerTitleTextView = header.findViewById(R.id.sticky_header_title);
             DateHeaderDataImpl headerData = getHeaderDataInPosition(headerPosition);
-            String dateString = headerData.getHeaderDate().format(DateTimeFormatter.ofPattern("EEEE MMMM dd"));
+            String dateString = headerData.getHeaderDate().format(DateTimeFormatter.ofPattern("EEEE MMM dd"));
             headerTitleTextView.setText(dateString.toUpperCase());
-            mCallback.onHeaderMoved(headerData.getHeaderDate());
+            mCallback.onNewHeaderAttached(headerData.getHeaderDate());
         }
 
     }
@@ -122,7 +122,7 @@ public class UpcomingEventListAdapter extends StickyHeaderAdapter<UpcomingEvent,
         void onItemClick(String eventId);
         public void showDialog(int title, int body, int positiveText, DialogInterface.OnClickListener positiveListener, int negativeText, DialogInterface.OnClickListener negativeListener, Object o);
         void refreshEventList();
-        void onHeaderMoved(LocalDate date);
+        void onNewHeaderAttached(LocalDate date);
 
     }
 
@@ -145,7 +145,7 @@ public class UpcomingEventListAdapter extends StickyHeaderAdapter<UpcomingEvent,
             super.onBind(position);
 
             DateHeaderDataImpl headerData = getHeaderDataInPosition(position);
-            String dateString = headerData.getHeaderDate().format(DateTimeFormatter.ofPattern("EEEE MMMM dd"));
+            String dateString = headerData.getHeaderDate().format(DateTimeFormatter.ofPattern("EEEE MMM dd"));
             messageTextView.setText(dateString.toUpperCase());
         }
 

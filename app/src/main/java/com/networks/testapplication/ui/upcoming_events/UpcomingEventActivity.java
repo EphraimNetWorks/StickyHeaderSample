@@ -24,6 +24,7 @@ import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import org.threeten.bp.LocalDate;
+import org.threeten.bp.Month;
 import org.threeten.bp.format.DateTimeFormatter;
 import org.threeten.bp.format.TextStyle;
 
@@ -59,13 +60,12 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
 
     }
 
+    private Month currentMonth;
     private void checkAndUpdateReservationMonth(LocalDate date){
 
-        String currentMonth = monthNameTextView.getText().toString();
-        String newMonth =  date.getMonth().getDisplayName(TextStyle.FULL, Locale.US).toUpperCase();
-
-        if(!currentMonth.equals(newMonth)){
-            monthNameTextView.setText(newMonth);
+        if(currentMonth == null || !currentMonth.equals(date.getMonth())){
+            monthNameTextView.setText(date.getMonth().getDisplayName(TextStyle.FULL, Locale.US).toUpperCase());
+            currentMonth = date.getMonth();
         }
     }
 
@@ -185,7 +185,7 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
     }
 
     @Override
-    public void onHeaderMoved(LocalDate date) {
+    public void onNewHeaderAttached(LocalDate date) {
 
         checkAndUpdateReservationMonth(date);
     }
