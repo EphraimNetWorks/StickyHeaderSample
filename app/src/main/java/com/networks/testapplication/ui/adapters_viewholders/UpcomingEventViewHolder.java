@@ -2,7 +2,6 @@ package com.networks.testapplication.ui.adapters_viewholders;
 
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.icu.text.SimpleDateFormat;
 import android.view.View;
 import android.widget.TextView;
 
@@ -12,11 +11,13 @@ import com.networks.testapplication.R;
 import com.networks.testapplication.data.UpcomingEvent;
 import com.networks.testapplication.utils.AppPreferencesHelper;
 
+import org.threeten.bp.OffsetDateTime;
+import org.threeten.bp.ZoneId;
+import org.threeten.bp.ZonedDateTime;
+import org.threeten.bp.format.DateTimeFormatter;
+
 import java.text.ParseException;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
