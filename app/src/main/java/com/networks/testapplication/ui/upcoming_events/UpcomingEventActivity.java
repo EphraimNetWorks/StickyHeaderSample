@@ -1,8 +1,10 @@
 package com.networks.testapplication.ui.upcoming_events;
 
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Pair;
 import android.view.View;
 import android.widget.TextView;
 
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.networks.testapplication.R;
+import com.networks.testapplication.calendar.EventDecorator;
 import com.networks.testapplication.data.DayEventReservations;
 import com.networks.testapplication.data.UpcomingEvent;
 import com.networks.testapplication.ui.adapters_viewholders.DateHeaderDataImpl;
@@ -35,8 +38,10 @@ import java.util.Locale;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class UpcomingEventActivity extends AppCompatActivity implements UpcomingEventListAdapter.Callback {
+public class UpcomingEventActivity extends AppCompatActivity implements UpcomingEventListAdapter.Callback, OnDateSelectedListener {
 
+    @BindView(R.id.calendarView)
+    MaterialCalendarView calendarView;
     @BindView(R.id.upcoming_guests_recycler_view)
     RecyclerView mRecyclerView;
     @BindView(R.id.month_name_textview)
@@ -45,6 +50,9 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
     UpcomingEventListAdapter mUpcomingEventAdapter;
 
     ArrayList<DayEventReservations> mDayEventReservationsArrayList;
+    ArrayList<CalendarDay> dates = new ArrayList<>();
+    LinearLayoutManager layoutManager;
+    Boolean updateCalendarViewOnScroll = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,12 +60,66 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
         setContentView(R.layout.activity_sticky_date);
         ButterKnife.bind(this);
 
+        setUpCalenderView();
+
         mUpcomingEventAdapter = new UpcomingEventListAdapter(this);
         mRecyclerView.setAdapter(mUpcomingEventAdapter);
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (dy == 0) {
+                    updateCalendarViewOnScroll = false;
+                }else {
+                    updateCalendarViewOnScroll = true;
+                }
+            }
+        });
+
+        layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
 
         //mimick scenarios
         mimickSucceedCall();
 
+    }
+
+    private void setUpCalenderView(){
+
+        calendarView.setOnDateChangedListener(this);
+
+        calendarView.setDateTextAppearance(View.ACCESSIBILITY_LIVE_REGION_ASSERTIVE);
+
+        updateCalendarViewDay(LocalDate.now());
+
+
+    }
+
+    @Override
+    public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
+        Pair<Boolean, Integer> isContained_Position = getPositionToScrollTo(date);
+        updateCalendarViewOnScroll = isContained_Position.first;
+
+        layoutManager.scrollToPositionWithOffset(isContained_Position.second,0);
+
+    }
+
+    private Pair<Boolean, Integer> getPositionToScrollTo(CalendarDay date){
+        if(mUpcomingEventAdapter.getDatePosition(date) != null){
+            return new Pair<>(true,mUpcomingEventAdapter.getDatePosition(date));
+        }else {
+            for(CalendarDay calendarDay : dates){
+                if(calendarDay.getDate().compareTo(date.getDate()) >= 0){
+                    return new Pair<>(false,mUpcomingEventAdapter.getDatePosition(calendarDay));
+                }
+            }
+            return new Pair<>(false,mUpcomingEventAdapter.getDatePosition(dates.get(dates.size()-1)));
+        }
     }
 
     private Month currentMonth;
@@ -69,6 +131,11 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
         }
     }
 
+    private void updateCalendarViewDay(LocalDate date){
+
+        calendarView.setCurrentDate(date);
+        calendarView.setSelectedDate(date);
+    }
 
     private void addData(ArrayList<DayEventReservations> data) {
         for (DayEventReservations dayEventReservations: data) {
@@ -76,8 +143,14 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
             DateHeaderDataImpl headerData1 = new DateHeaderDataImpl(HeaderDataImpl.HEADER,
                     R.layout.item_sticky_header,dayEventReservations.getDayDate());
 
+            dates.add(CalendarDay.from(dayEventReservations.getDayDate()));
             mUpcomingEventAdapter.addHeaderAndData(dayEventReservations.getUpcomingEvents(), headerData1);
         }
+
+
+        //add small dots on event days
+        EventDecorator eventDecorator = new EventDecorator(Color.RED, dates);
+        calendarView.addDecorator(eventDecorator);
 
     }
 
@@ -188,6 +261,9 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
     public void onNewHeaderAttached(LocalDate date) {
 
         checkAndUpdateReservationMonth(date);
+
+        if (updateCalendarViewOnScroll) updateCalendarViewDay(date);
+
     }
 
 }

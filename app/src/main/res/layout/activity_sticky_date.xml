@@ -6,6 +6,18 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:mcv_selectionColor="@color/ms_material_blue_500"
+        app:mcv_showOtherDates="all"
+        app:mcv_firstDayOfWeek="monday"
+        app:mcv_calendarMode="week"
+        app:layout_constraintTop_toTopOf="parent"
+        android:layout_marginBottom="8dp"
+        app:mcv_headerTextAppearance="@style/TextAppearance.MaterialComponents.Headline6"
+        />
 
     <TextView
         android:id="@+id/month_name_textview"
@@ -14,8 +26,9 @@
         android:textAppearance="@style/TextAppearance.MaterialComponents.Headline5"
         android:padding="16dp"
         android:text="DECEMBER"
+        android:visibility="visible"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/calendarView"
         />
 
     <androidx.recyclerview.widget.RecyclerView

@@ -1,23 +1,29 @@
 package com.networks.testapplication.ui.adapters_viewholders;
 
+import android.util.SparseArray;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.networks.testapplication.R;
+import com.networks.testapplication.data.DayEventReservations;
 import com.networks.testapplication.utils.EmptyHeaderDataImpl;
 import com.networks.testapplication.utils.NetworkState;
 import com.networks.testapplication.utils.Status;
+import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.saber.stickyheader.stickyData.HeaderData;
 import com.saber.stickyheader.stickyData.StickyMainData;
 import com.saber.stickyheader.stickyView.StickHeaderItemDecoration;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 
 public abstract class StickyHeaderAdapter<D extends StickyMainData, H extends HeaderData> extends RecyclerView.Adapter implements StickHeaderItemDecoration.StickyHeaderInterface{
     private List<StickyMainData> mData = new ArrayList<>();
+    private HashMap<CalendarDay, Integer> dateMaps= new HashMap<>();
     protected NetworkState mNetworkState ;
 
     @Override
@@ -76,6 +82,10 @@ public abstract class StickyHeaderAdapter<D extends StickyMainData, H extends He
         return headerPosition;
     }
 
+    public Integer getDatePosition(CalendarDay date){
+        return dateMaps.get(date);
+    }
+
     /*
     *Show empty viewholder
      */
@@ -103,11 +113,22 @@ public abstract class StickyHeaderAdapter<D extends StickyMainData, H extends He
      */
     public void addHeaderAndData(@NonNull List<D> datas, @Nullable HeaderData header) {
 
+        if(header instanceof DateHeaderDataImpl) {
+            updateDatesMap((DateHeaderDataImpl) header);
+        }
+
         if (header != null) {
             mData.add(header);
         }
 
         mData.addAll(datas);
+
+
+    }
+
+    private void updateDatesMap(DateHeaderDataImpl dateHeader){
+        CalendarDay headerDay = CalendarDay.from(dateHeader.getHeaderDate());
+        dateMaps.put(headerDay,mData.size());
     }
 
     /*
@@ -116,6 +137,10 @@ public abstract class StickyHeaderAdapter<D extends StickyMainData, H extends He
     public void setHeaderAndData(@NonNull List<D> datas, @Nullable HeaderData header) {
 
         mData.clear();
+
+        if(header instanceof DateHeaderDataImpl) {
+            updateDatesMap((DateHeaderDataImpl) header);
+        }
 
         if (header != null) {
             mData.add(header);
