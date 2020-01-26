@@ -129,10 +129,15 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
         }
     }
 
+
+    LocalDate currentDate = LocalDate.now();
     private void updateCalendarViewDay(LocalDate date){
 
-        calendarView.setCurrentDate(date);
-        calendarView.setSelectedDate(date);
+        if( currentDate != date) {
+            currentDate = date;
+            calendarView.setCurrentDate(date);
+            calendarView.setSelectedDate(date);
+        }
     }
 
     private void addData(ArrayList<DayEventReservations> data) {
