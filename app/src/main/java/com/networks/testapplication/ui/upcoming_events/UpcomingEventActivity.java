@@ -60,8 +60,6 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
         setContentView(R.layout.activity_sticky_date);
         ButterKnife.bind(this);
 
-        setUpCalenderView();
-
         mUpcomingEventAdapter = new UpcomingEventListAdapter(this);
         mRecyclerView.setAdapter(mUpcomingEventAdapter);
 
@@ -97,7 +95,7 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
 
         updateCalendarViewDay(LocalDate.now());
 
-
+        onDateSelected(calendarView, CalendarDay.from(LocalDate.now()),true);
     }
 
     @Override
@@ -147,6 +145,7 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
             mUpcomingEventAdapter.addHeaderAndData(dayEventReservations.getUpcomingEvents(), headerData1);
         }
 
+        setUpCalenderView();
 
         //add small dots on event days
         EventDecorator eventDecorator = new EventDecorator(Color.RED, dates);
