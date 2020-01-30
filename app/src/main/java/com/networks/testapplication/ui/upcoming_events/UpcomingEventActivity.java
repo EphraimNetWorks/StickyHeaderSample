@@ -91,8 +91,6 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
 
         calendarView.setOnDateChangedListener(this);
 
-        calendarView.setDateTextAppearance(View.ACCESSIBILITY_LIVE_REGION_ASSERTIVE);
-
         updateCalendarViewDay(LocalDate.now());
 
         onDateSelected(calendarView, CalendarDay.from(LocalDate.now()),true);
@@ -152,8 +150,10 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
 
         setUpCalenderView();
 
+        DateDecorator dateDecorator = new DateDecorator(this);
+        calendarView.addDecorator(dateDecorator);
         //add small dots on event days
-        EventDecorator eventDecorator = new EventDecorator(Color.RED, dates);
+        EventDecorator eventDecorator = new EventDecorator(this, dates);
         calendarView.addDecorator(eventDecorator);
 
     }

@@ -115,7 +115,7 @@ public class CalendarFragment extends Fragment implements OnDateSelectedListener
         }
 
         //add small dots on event days
-        EventDecorator eventDecorator = new EventDecorator(Color.RED, map.keySet());
+        EventDecorator eventDecorator = new EventDecorator(getContext(), map.keySet());
         calendarView.addDecorator(eventDecorator);
 
 
