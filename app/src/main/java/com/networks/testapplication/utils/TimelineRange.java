@@ -24,7 +24,7 @@ public class TimelineRange {
 
     public Pair<Boolean,Boolean> contains(int position){
         int positionRangeValue = position*100;
-        return new Pair<>(range.contains(positionRangeValue),
-                range.contains(positionRangeValue+50));
+        return new Pair<>(range.contains(positionRangeValue) && range.contains(Math.abs(positionRangeValue-50)),
+                 range.contains(Math.abs(positionRangeValue)) && range.contains(positionRangeValue+50));
     }
 }

@@ -59,9 +59,11 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.Timeli
                 Pair<Boolean,Boolean> containsPair = selectedRange.contains(hour);
                 if(containsPair.first){
                     item.setFirstLineColor(highlightedColor);
-                    if(containsPair.second){
-                        item.setSecondLineColor(highlightedColor);
-                    }
+                }
+                if(containsPair.second){
+                    item.setSecondLineColor(highlightedColor);
+                }
+                if(containsPair.first || containsPair.second){
                     break;
                 }
             }
