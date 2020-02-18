@@ -9,13 +9,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.upcoming_events.StickyFragmentActivity">
-
-        </activity>
-        <activity android:name=".final_sample.FinalSampleActivity"></activity>
-        <activity android:name=".calendar.MainActivity" />
-        <activity android:name=".ui.upcoming_guests.UpcomingGuestsActivity" />
-        <activity android:name=".ui.upcoming_events.UpcomingEventActivity">
+        <activity android:name=".ui.timeline.TimelineActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

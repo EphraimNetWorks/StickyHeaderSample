@@ -8,9 +8,4 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="CustomTextAppearance" parent="TextAppearance.MaterialComponents.Body1">
-        <item name="android:textColor">@drawable/my_date_text_color</item>
-        <item name="android:textStyle">bold</item>
-    </style>
-
 </resources>
