@@ -1,14 +1,18 @@
 package com.networks.testapplication.utils;
 
 import android.content.Context;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.networks.testapplication.R;
+
+import org.threeten.bp.LocalTime;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +45,9 @@ public class TimelineView extends FrameLayout {
 
     public void setHighlightedRanges(List<TimelineRange> highlightedRanges){
         adapter.setRanges(highlightedRanges);
+        new Handler().postDelayed(() -> {
+            scrollTo(LocalTime.now());
+        },100);
     }
 
     public void setHighlightedLineColor(int color){
@@ -49,6 +56,16 @@ public class TimelineView extends FrameLayout {
 
     public void setDefaultLineColor(int color){
         adapter.setDefaultColor(color);
+    }
+
+    public void scrollTo(LocalTime time){
+        ((LinearLayoutManager)timelineRecycler.getLayoutManager())
+                .scrollToPositionWithOffset(getTimePosition(time),50);
+    }
+
+    private int getTimePosition(LocalTime time){
+
+        return time.getHour()+(time.getMinute()<30 ? 0:1);
     }
 
 
