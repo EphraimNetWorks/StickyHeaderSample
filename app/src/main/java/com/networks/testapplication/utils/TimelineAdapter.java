@@ -55,15 +55,24 @@ public class TimelineAdapter extends RecyclerView.Adapter<TimelineAdapter.Timeli
         viewHolderItems.clear();
         for(int hour=0; hour<25; hour++){
             Item item = new Item(defaultColor, defaultColor);
+
+            boolean containsFirst = false;
+            boolean containsSecond = false;
             for (TimelineRange selectedRange: selectedRanges){
-                Pair<Boolean,Boolean> containsPair = selectedRange.contains(hour);
-                if(containsPair.first){
-                    item.setFirstLineColor(highlightedColor);
+
+                if(!containsFirst){
+                    containsFirst = selectedRange.containsFirst(hour);
+                    if(containsFirst){
+                        item.setFirstLineColor(highlightedColor);
+                    }
                 }
-                if(containsPair.second){
-                    item.setSecondLineColor(highlightedColor);
+                if(!containsSecond){
+                    containsSecond = selectedRange.containsSecond(hour);
+                    if(containsSecond){
+                        item.setSecondLineColor(highlightedColor);
+                    }
                 }
-                if(containsPair.first || containsPair.second){
+                if(containsFirst && containsSecond){
                     break;
                 }
             }

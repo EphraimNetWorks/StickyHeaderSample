@@ -16,16 +16,20 @@ public class TimelineRange {
     public TimelineRange(TimelineTime startTime, TimelineTime endTime){
         int startMinute = startTime.getMinute();
         int endMinute = endTime.getMinute();
-        int rangeLower = startTime.getHour()*100+ (startMinute<=30? 0:50);
+        int rangeLower = startTime.getHour()*100+ (startMinute<30? 0:50);
         int rangeUpper = endTime.getHour()*100+ (endMinute == 0?0:endMinute<=30?50:100);
         range = new Range<>(rangeLower, rangeUpper);
 
     }
 
 
-    public Pair<Boolean,Boolean> contains(int position){
+    public Boolean containsFirst(int position){
         int positionRangeValue = position*100;
-        return new Pair<>(range.contains(positionRangeValue) && range.contains(positionRangeValue-50),
-                 range.contains(Math.abs(positionRangeValue)) && range.contains(positionRangeValue+50));
+        return range.contains(positionRangeValue) && range.contains(positionRangeValue-50);
+    }
+
+    public Boolean containsSecond(int position){
+        int positionRangeValue = position*100;
+        return range.contains(Math.abs(positionRangeValue)) && range.contains(positionRangeValue+50);
     }
 }
