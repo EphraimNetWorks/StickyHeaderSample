@@ -6,16 +6,18 @@ import android.util.Range;
 
 import org.threeten.bp.LocalTime;
 
+import java.sql.Time;
+
 public class TimelineRange {
 
 
     private Range<Integer> range;
 
-    public TimelineRange(LocalTime startTime, LocalTime endTime){
+    public TimelineRange(TimelineTime startTime, TimelineTime endTime){
         int startMinute = startTime.getMinute();
         int endMinute = endTime.getMinute();
         int rangeLower = startTime.getHour()*100+ (startMinute<30? 0:50);
-        int rangeUpper = endTime.getHour()*100+ (endMinute<30? 0:50);
+        int rangeUpper = endTime.getHour()*100+ (endMinute<30?50:100);
         range = new Range<>(rangeLower, rangeUpper);
 
     }

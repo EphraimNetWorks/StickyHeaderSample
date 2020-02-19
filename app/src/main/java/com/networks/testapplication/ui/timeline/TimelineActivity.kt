@@ -7,6 +7,7 @@ import androidx.core.content.ContextCompat
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.networks.testapplication.R
 import com.networks.testapplication.utils.TimelineRange
+import com.networks.testapplication.utils.TimelineTime
 import kotlinx.android.synthetic.main.activity_timeline.*
 import org.threeten.bp.LocalTime
 
@@ -19,10 +20,9 @@ class TimelineActivity : AppCompatActivity() {
         AndroidThreeTen.init(this)
 
         val ranges = arrayListOf(
-            TimelineRange(LocalTime.of(0,0), LocalTime.of(1,30)),
-            TimelineRange(LocalTime.of(3,30), LocalTime.of(4,0)),
-            TimelineRange(LocalTime.of(9,30), LocalTime.of(10,30)),
-            TimelineRange(LocalTime.of(15,0), LocalTime.of(17,30))
+            TimelineRange(TimelineTime(9,15), TimelineTime(9,45)),
+            TimelineRange(TimelineTime(2,0), TimelineTime(2,1)),
+            TimelineRange(TimelineTime(23,0), TimelineTime(24,0))
         )
 
         timeline_view.apply {

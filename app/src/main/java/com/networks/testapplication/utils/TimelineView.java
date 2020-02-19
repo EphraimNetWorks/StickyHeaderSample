@@ -46,7 +46,8 @@ public class TimelineView extends FrameLayout {
     public void setHighlightedRanges(List<TimelineRange> highlightedRanges){
         adapter.setRanges(highlightedRanges);
         new Handler().postDelayed(() -> {
-            scrollTo(LocalTime.now());
+            LocalTime time = LocalTime.now();
+            scrollTo(new TimelineTime(time.getHour(),time.getMinute()));
         },100);
     }
 
@@ -58,12 +59,12 @@ public class TimelineView extends FrameLayout {
         adapter.setDefaultColor(color);
     }
 
-    public void scrollTo(LocalTime time){
+    public void scrollTo(TimelineTime time){
         ((LinearLayoutManager)timelineRecycler.getLayoutManager())
                 .scrollToPositionWithOffset(getTimePosition(time),50);
     }
 
-    private int getTimePosition(LocalTime time){
+    private int getTimePosition(TimelineTime time){
 
         return time.getHour()+(time.getMinute()<30 ? 0:1);
     }
