@@ -21,6 +21,7 @@ class TimelineActivity : AppCompatActivity() {
 
         val ranges = arrayListOf(
             TimelineRange(TimelineTime(9,15), TimelineTime(9,45)),
+            TimelineRange(TimelineTime(10,30), TimelineTime(11,0)),
             TimelineRange(TimelineTime(2,0), TimelineTime(2,1)),
             TimelineRange(TimelineTime(23,0), TimelineTime(24,0))
         )

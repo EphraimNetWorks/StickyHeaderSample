@@ -17,7 +17,7 @@ public class TimelineRange {
         int startMinute = startTime.getMinute();
         int endMinute = endTime.getMinute();
         int rangeLower = startTime.getHour()*100+ (startMinute<30? 0:50);
-        int rangeUpper = endTime.getHour()*100+ (endMinute<30?50:100);
+        int rangeUpper = endTime.getHour()*100+ (endMinute == 0?0:endMinute<30?50:100);
         range = new Range<>(rangeLower, rangeUpper);
 
     }
