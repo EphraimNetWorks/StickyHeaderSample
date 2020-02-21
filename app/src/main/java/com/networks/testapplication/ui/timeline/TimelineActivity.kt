@@ -3,7 +3,12 @@ package com.networks.testapplication.ui.timeline
 import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Pair
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Observer
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.networks.testapplication.R
 import com.networks.testapplication.utils.TimelineRange
@@ -11,7 +16,9 @@ import com.networks.testapplication.utils.TimelineTime
 import kotlinx.android.synthetic.main.activity_timeline.*
 import org.threeten.bp.LocalTime
 
-class TimelineActivity : AppCompatActivity() {
+class TimelineActivity : AppCompatActivity(), ItemScrollChangeListener{
+
+    private val timelineViewScrollPosition = MutableLiveData<Int>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,23 +26,17 @@ class TimelineActivity : AppCompatActivity() {
 
         AndroidThreeTen.init(this)
 
-        val ranges = arrayListOf(
-            TimelineRange(TimelineTime(9,15), TimelineTime(9,45)),
-            TimelineRange(TimelineTime(10,30), TimelineTime(11,0)),
-            TimelineRange(TimelineTime(2,0), TimelineTime(2,1)),
-            TimelineRange(TimelineTime(21,0), TimelineTime(22,0)),
-            TimelineRange(TimelineTime(22,0), TimelineTime(23,0)),
-            TimelineRange(TimelineTime(23,0), TimelineTime(24,0)),
-            TimelineRange(TimelineTime(3,15), TimelineTime(3,30)),
-            TimelineRange(TimelineTime(3,28), TimelineTime(5,0))
-        )
+        timeline_recycler_view.adapter = TestRecyclerAdapter(this)
 
-        timeline_view.apply {
-            setDefaultLineColor(Color.LTGRAY)
-            setHighlightedLineColor(ContextCompat.getColor(this@TimelineActivity,R.color.colorAccent))
-            setHighlightedRanges(ranges)
-        }
+
+
     }
 
+    override fun getScrollPosition(): Pair<LifecycleOwner, LiveData<Int>> {
+        return Pair(this,timelineViewScrollPosition)
+    }
 
+    override fun onItemScrolled(newPosition: Int) {
+        timelineViewScrollPosition.value = newPosition
+    }
 }
