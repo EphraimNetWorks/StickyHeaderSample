@@ -24,7 +24,7 @@ public class NewTimelineView extends FrameLayout {
     private int defaultColor = Color.LTGRAY;
 
     private LinearLayout timelineLinearLayout;
-    private HorizontalScrollView hsv;
+    private ObservableHorizontalScrollView hsv;
 
     private Context ctx;
 
@@ -53,8 +53,19 @@ public class NewTimelineView extends FrameLayout {
     public void setOnScrollChangeListener(NewTimelineView.OnScrollListener scrollChangeListener){
 
 
-        hsv.getViewTreeObserver().addOnScrollChangedListener(() ->
-                scrollChangeListener.onScrollChange(hsv.getScrollX()));
+        hsv.setOnScrollListener(new ObservableHorizontalScrollView.OnScrollListener() {
+            @Override
+            public void onScrollChanged(ObservableHorizontalScrollView scrollView, int x, int y, int oldX, int oldY) {
+                scrollChangeListener.onScrollChange(x);
+            }
+
+            @Override
+            public void onEndScroll(ObservableHorizontalScrollView scrollView) {
+
+            }
+        });
+
+
     }
 
     public void setRanges(List<TimelineRange> selectedRanges) {
