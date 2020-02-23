@@ -1,6 +1,7 @@
 package com.networks.testapplication.ui.timeline;
 
 import android.graphics.Color;
+import android.os.Handler;
 import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -43,7 +44,7 @@ public class TestRecyclerAdapter extends RecyclerView.Adapter<TestRecyclerAdapte
 
     @Override
     public int getItemCount() {
-        return 4;
+        return 30;
     }
 
     class TestViewHolder extends RecyclerView.ViewHolder{
@@ -63,12 +64,19 @@ public class TestRecyclerAdapter extends RecyclerView.Adapter<TestRecyclerAdapte
             ArrayList<TimelineRange> ranges = new ArrayList<>();
             ranges.add(new TimelineRange(new TimelineTime(0,15), new TimelineTime(3,45)));
 
-            mTimelineView.setRanges(ranges);
-
             Pair<LifecycleOwner, LiveData<Integer>> pair = itemScrollChangeListener.getScrollPosition();
+
+            mTimelineView.setRanges(ranges, pair.second.getValue()==null);
+            new Handler().post(()->{
+
+                if (pair.second.getValue()!=null && mTimelineView.getScrollPosition() != pair.second.getValue())
+                    mTimelineView.scrollTo(pair.second.getValue());
+            });
+
             pair.second.observe(pair.first, scrollX -> {
                 mTimelineView.scrollTo(scrollX);
             });
+
 
             mTimelineView.setOnScrollChangeListener(scrollX -> mItemScrollChangeListener.onItemScrolled(scrollX));
         }

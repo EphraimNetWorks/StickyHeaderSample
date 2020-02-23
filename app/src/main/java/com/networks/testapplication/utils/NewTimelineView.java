@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
 import androidx.annotation.Nullable;
@@ -32,14 +31,14 @@ public class NewTimelineView extends FrameLayout {
         super(context);
         ctx = context;
         initView(context);
-        setRanges(new ArrayList<>());
+        setRanges(new ArrayList<>(),false);
     }
 
     public NewTimelineView(Context context, @Nullable AttributeSet attrs){
         super(context, attrs);
         ctx = context;
         initView(context);
-        setRanges(new ArrayList<>());
+        setRanges(new ArrayList<>(), false);
     }
 
 
@@ -68,7 +67,7 @@ public class NewTimelineView extends FrameLayout {
 
     }
 
-    public void setRanges(List<TimelineRange> selectedRanges) {
+    public void setRanges(List<TimelineRange> selectedRanges, boolean scrollToCurrentTime) {
         timelineLinearLayout.removeAllViews();
         for(int hour=0; hour<25; hour++){
             Item item = new Item(defaultColor, defaultColor);
@@ -102,10 +101,12 @@ public class NewTimelineView extends FrameLayout {
             timelineLinearLayout.addView(timelinePoint);
         }
 
-        new Handler().postDelayed(() -> {
-            LocalTime time = LocalTime.now();
-            scrollToTime(new TimelineTime(time.getHour(),time.getMinute()));
-        },100);
+        if(scrollToCurrentTime) {
+            new Handler().postDelayed(() -> {
+                LocalTime time = LocalTime.now();
+                scrollToTime(new TimelineTime(time.getHour(), time.getMinute()));
+            }, 100);
+        }
     }
 
     public void setHighlightedLineColor(int color){
@@ -125,6 +126,10 @@ public class NewTimelineView extends FrameLayout {
 
     public void scrollTo(int position){
         hsv.smoothScrollTo( position,50);
+    }
+
+    public int getScrollPosition(){
+        return hsv.getScrollX();
     }
 
     public interface OnScrollListener{
