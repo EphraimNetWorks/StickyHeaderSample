@@ -33,7 +33,7 @@ public class SelectableTimelinePoint extends FrameLayout {
     private boolean isFirstRangeSelected = false;
     private boolean isSecondRangeSelected = false;
 
-    private OnRangeStateChangeListener mlistener;
+    private OnPointRangeStateChangeListener mlistener;
 
     private SelectableTimelineView.Item mItem;
 
@@ -112,8 +112,20 @@ public class SelectableTimelinePoint extends FrameLayout {
 
     }
 
-    public void setOnRangeSelectedListener(OnRangeStateChangeListener listener){
+    public SelectableTimelineView.Item getItem() {
+        return mItem;
+    }
+
+    public void setOnRangeSelectedListener(OnPointRangeStateChangeListener listener){
         mlistener = listener;
+    }
+
+    public boolean isFirstRangeSelected() {
+        return isFirstRangeSelected;
+    }
+
+    public boolean isSecondRangeSelected() {
+        return isSecondRangeSelected;
     }
 
     private void setupFirstListener(SelectableTimelineView.Item item){
@@ -147,10 +159,27 @@ public class SelectableTimelinePoint extends FrameLayout {
         verticalLineExtension.setBackgroundColor(selectedColor);
         firstRangeView.setBackgroundColor(ColorUtils.setAlphaComponent(selectedColor, 50));
         if (mlistener != null) {
-            mlistener.onRangeSelected(new TimelineTime(mItem.getPosition() - 1, 30),
+            mlistener.onRangeSelected(this,
+                    new TimelineTime(mItem.getPosition() - 1, 30),
                     new TimelineTime(mItem.getPosition(), 0));
         }
-        isFirstRangeSelected = !isFirstRangeSelected;
+        isFirstRangeSelected = true;
+    }
+
+    public TimelineTime getSelectedStartTime(){
+        TimelineTime time;
+        if(isFirstRangeSelected)
+            time = new TimelineTime(mItem.getPosition() - 1, 30);
+        else time = new TimelineTime(mItem.getPosition(), 0);
+        return time;
+    }
+
+    public TimelineTime getSelectedEndTime(){
+        TimelineTime time;
+        if(!isSecondRangeSelected)
+            time = new TimelineTime(mItem.getPosition(), 0);
+        else time = new TimelineTime(mItem.getPosition(), 30);
+        return time;
     }
 
     public void selectSecondRange(){
@@ -160,10 +189,11 @@ public class SelectableTimelinePoint extends FrameLayout {
         verticalLineExtension.setBackgroundColor(selectedColor);
 
         if (mlistener != null) {
-            mlistener.onRangeSelected(new TimelineTime(mItem.getPosition(), 0),
+            mlistener.onRangeSelected(this,
+                    new TimelineTime(mItem.getPosition(), 0),
                     new TimelineTime(mItem.getPosition(), 30));
         }
-        isSecondRangeSelected = !isSecondRangeSelected;
+        isSecondRangeSelected = true;
     }
 
 
@@ -171,28 +201,34 @@ public class SelectableTimelinePoint extends FrameLayout {
     public void deselectFirstRange(){
         firstRangeView.setBackgroundColor(defaultColor);
 
-        verticalLine.setBackgroundColor(unselectableColor);
-        verticalLineExtension.setBackgroundColor(unselectableColor);
+        if(!isSecondRangeSelected) {
+            verticalLine.setBackgroundColor(unselectableColor);
+            verticalLineExtension.setBackgroundColor(unselectableColor);
+        }
 
         if (mlistener != null) {
-            mlistener.onRangeDeselected(new TimelineTime(mItem.getPosition() - 1, 30),
+            mlistener.onRangeDeselected(this,
+                    new TimelineTime(mItem.getPosition() - 1, 30),
                     new TimelineTime(mItem.getPosition(), 0));
         }
-        isFirstRangeSelected = !isFirstRangeSelected;
+        isFirstRangeSelected = false;
     }
 
     public void deselectSecondRange(){
 
         secondRangeView.setBackgroundColor(defaultColor);
 
-        verticalLine.setBackgroundColor(unselectableColor);
-        verticalLineExtension.setBackgroundColor(unselectableColor);
+        if(!isFirstRangeSelected) {
+            verticalLine.setBackgroundColor(unselectableColor);
+            verticalLineExtension.setBackgroundColor(unselectableColor);
+        }
 
         if (mlistener != null) {
-            mlistener.onRangeDeselected(new TimelineTime(mItem.getPosition(), 0),
+            mlistener.onRangeDeselected(this,
+                    new TimelineTime(mItem.getPosition(), 0),
                     new TimelineTime(mItem.getPosition(), 30));
         }
-        isSecondRangeSelected = !isSecondRangeSelected;
+        isSecondRangeSelected = false;
 
     }
 
@@ -227,5 +263,9 @@ public class SelectableTimelinePoint extends FrameLayout {
         defaultColor = color;
     }
 
+    public interface OnPointRangeStateChangeListener{
+        void onRangeSelected(SelectableTimelinePoint point, TimelineTime from, TimelineTime to);
+        void onRangeDeselected(SelectableTimelinePoint point, TimelineTime from, TimelineTime to);
+    }
 
 }

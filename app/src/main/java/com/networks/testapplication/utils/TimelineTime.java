@@ -1,5 +1,7 @@
 package com.networks.testapplication.utils;
 
+import androidx.annotation.Nullable;
+
 public class TimelineTime {
 
     private int hour;
@@ -26,5 +28,14 @@ public class TimelineTime {
 
     public int getMinute() {
         return minute;
+    }
+
+    @Override
+    public boolean equals(@Nullable Object obj) {
+        boolean equals = false;
+        if(obj instanceof TimelineTime){
+            equals = ((TimelineTime) obj).getHour() == hour && ((TimelineTime) obj).getMinute() == minute;
+        }
+        return equals;
     }
 }

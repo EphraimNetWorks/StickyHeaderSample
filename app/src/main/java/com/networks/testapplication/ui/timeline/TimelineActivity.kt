@@ -27,6 +27,7 @@ class TimelineActivity : AppCompatActivity(), ItemScrollChangeListener{
 
         AndroidThreeTen.init(this)
 
+
         val ranges = arrayListOf(
             TimelineRange(TimelineTime(3,30), TimelineTime(4,30)),
                     TimelineRange(TimelineTime(11,0), TimelineTime(14,30))
@@ -38,15 +39,15 @@ class TimelineActivity : AppCompatActivity(), ItemScrollChangeListener{
         selectable_timeline_view.setOnRangeSelectedListener(object : OnRangeStateChangeListener{
             override fun onRangeSelected(from: TimelineTime, to: TimelineTime) {
 
-                Toast.makeText(this@TimelineActivity,
-                    "Range ${from.hour}:${from.minute} to ${to.hour}:${to.minute} Selected",
-                    Toast.LENGTH_LONG).show()
+//                Toast.makeText(this@TimelineActivity,
+//                    "Range ${from.hour}:${from.minute} to ${to.hour}:${to.minute} Selected",
+//                    Toast.LENGTH_LONG).show()
             }
 
             override fun onRangeDeselected(from: TimelineTime, to: TimelineTime) {
-                Toast.makeText(this@TimelineActivity,
-                    "Range ${from.hour}:${from.minute} to ${to.hour}:${to.minute} Deselected",
-                    Toast.LENGTH_LONG).show()
+//                Toast.makeText(this@TimelineActivity,
+//                    "Range ${from.hour}:${from.minute} to ${to.hour}:${to.minute} Deselected",
+//                    Toast.LENGTH_LONG).show()
             }
         })
 

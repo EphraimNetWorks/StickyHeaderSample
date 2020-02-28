@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Pair;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -15,9 +16,12 @@ import com.networks.testapplication.R;
 import org.threeten.bp.LocalTime;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
-public class SelectableTimelineView extends FrameLayout implements OnRangeStateChangeListener {
+public class SelectableTimelineView extends FrameLayout implements SelectableTimelinePoint.OnPointRangeStateChangeListener {
 
     private int selectedColor = Color.GREEN;
     private int unselectableColor = Color.LTGRAY;
@@ -29,6 +33,8 @@ public class SelectableTimelineView extends FrameLayout implements OnRangeStateC
     private Context ctx;
 
     private OnRangeStateChangeListener mlistener;
+
+    private ArrayList<SelectableTimelinePoint> selectedRanges = new ArrayList<>();
 
     public SelectableTimelineView(Context context){
         super(context);
@@ -153,14 +159,46 @@ public class SelectableTimelineView extends FrameLayout implements OnRangeStateC
     }
 
     @Override
-    public void onRangeSelected(TimelineTime from, TimelineTime to) {
+    public void onRangeSelected(SelectableTimelinePoint point,
+                                TimelineTime from, TimelineTime to) {
+
+
+        boolean isContinuing = selectedRanges.isEmpty();
+        for(SelectableTimelinePoint selectedPoint: selectedRanges){
+            TimelineTime startTime = selectedPoint.getSelectedStartTime();
+            TimelineTime endTime = selectedPoint.getSelectedEndTime();
+
+            if(to.equals(startTime) || from.equals(endTime) ){
+                isContinuing = true;
+                break;
+            }
+        }
+
+        if(!isContinuing) {
+            ArrayList<SelectableTimelinePoint> pointsToDeselect = new ArrayList<>();
+            pointsToDeselect.addAll(selectedRanges);
+            selectedRanges.clear();
+            for(SelectableTimelinePoint selectedPoint: pointsToDeselect){
+                if(selectedPoint.getItem().position >0) selectedPoint.deselectFirstRange();
+                if(selectedPoint.getItem().position <24) selectedPoint.deselectSecondRange();
+            }
+
+        }
+
+        selectedRanges.add(point);
         if(mlistener != null) {
             mlistener.onRangeSelected(from, to);
         }
     }
 
     @Override
-    public void onRangeDeselected(TimelineTime from, TimelineTime to) {
+    public void onRangeDeselected(SelectableTimelinePoint point,
+                                  TimelineTime from, TimelineTime to) {
+
+        if(!point.isFirstRangeSelected() && !point.isSecondRangeSelected()){
+            selectedRanges.remove(point);
+        }
+
         if(mlistener != null) {
             mlistener.onRangeDeselected(from, to);
         }
@@ -198,7 +236,5 @@ public class SelectableTimelineView extends FrameLayout implements OnRangeStateC
         }
 
     }
-
-
 
 }
