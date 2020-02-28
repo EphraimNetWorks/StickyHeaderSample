@@ -1,0 +1,204 @@
+package com.networks.testapplication.utils;
+
+import android.content.Context;
+import android.graphics.Color;
+import android.os.Handler;
+import android.util.AttributeSet;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+
+import androidx.annotation.Nullable;
+
+import com.networks.testapplication.R;
+
+import org.threeten.bp.LocalTime;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class SelectableTimelineView extends FrameLayout implements OnRangeStateChangeListener {
+
+    private int selectedColor = Color.GREEN;
+    private int unselectableColor = Color.LTGRAY;
+    private int defaultColor = Color.TRANSPARENT;
+
+    private LinearLayout timelineLinearLayout;
+    private ObservableHorizontalScrollView hsv;
+
+    private Context ctx;
+
+    private OnRangeStateChangeListener mlistener;
+
+    public SelectableTimelineView(Context context){
+        super(context);
+        ctx = context;
+        initView(context);
+        setUnselectableRanges(new ArrayList<>(),false);
+    }
+
+    public SelectableTimelineView(Context context, @Nullable AttributeSet attrs){
+        super(context, attrs);
+        ctx = context;
+        initView(context);
+        setUnselectableRanges(new ArrayList<>(), false);
+    }
+
+
+    private void initView(Context context){
+        View view = View.inflate(context, R.layout.new_timeline_view, null);
+        hsv = view.findViewById(R.id.timeline_hsv);
+        timelineLinearLayout = view.findViewById(R.id.timeline_view_linear_layout);
+        addView(view);
+    }
+
+    public void setOnScrollChangeListener(SelectableTimelineView.OnScrollListener scrollChangeListener){
+
+
+        hsv.setOnScrollListener(new ObservableHorizontalScrollView.OnScrollListener() {
+            @Override
+            public void onScrollChanged(ObservableHorizontalScrollView scrollView, int x, int y, int oldX, int oldY) {
+                scrollChangeListener.onScrollChange(x);
+            }
+
+            @Override
+            public void onEndScroll(ObservableHorizontalScrollView scrollView) {
+
+            }
+        });
+
+
+    }
+
+    public void setUnselectableRanges(List<TimelineRange> selectedRanges, boolean scrollToCurrentTime) {
+        timelineLinearLayout.removeAllViews();
+        for(int hour=0; hour<25; hour++){
+            Item item = new Item(selectedColor, selectedColor, hour);
+
+            boolean containsFirst = false;
+            boolean containsSecond = false;
+            for (TimelineRange selectedRange: selectedRanges){
+
+                if(!containsFirst){
+                    containsFirst = selectedRange.containsFirst(hour);
+                    if(containsFirst){
+                        item.setFirstLineColor(unselectableColor);
+                    }
+                }
+                if(!containsSecond){
+                    containsSecond = selectedRange.containsSecond(hour);
+                    if(containsSecond){
+                        item.setSecondLineColor(unselectableColor);
+                    }
+                }
+                if(containsFirst && containsSecond){
+                    break;
+                }
+            }
+
+            SelectableTimelinePoint timelinePoint = new SelectableTimelinePoint(ctx);
+            timelinePoint.setUnselectableColor(unselectableColor);
+            timelinePoint.setDefaultColor(defaultColor);
+            timelinePoint.setSelectedColor(selectedColor);
+            timelinePoint.setOnRangeSelectedListener(this);
+            timelinePoint.setItem(item,25);
+
+            timelineLinearLayout.addView(timelinePoint);
+        }
+
+        if(scrollToCurrentTime) {
+            new Handler().postDelayed(() -> {
+                LocalTime time = LocalTime.now();
+                scrollToTime(new TimelineTime(time.getHour(), time.getMinute()));
+            }, 100);
+        }
+    }
+
+
+    public void setOnRangeSelectedListener(OnRangeStateChangeListener listener){
+        mlistener = listener;
+    }
+
+
+    public void setSelectedColor(int color){
+
+        selectedColor = color;
+    }
+
+    public void setDeselectedColor(int color){
+
+        defaultColor = color;
+    }
+
+    public void setUnselectableColor(int color){
+
+        unselectableColor = color;
+    }
+
+    public void scrollToTime(TimelineTime time){
+        int offset = 5;
+        scrollTo(timelineLinearLayout.getChildAt(time.getHour()).getLeft()+offset);
+    }
+
+    public void scrollTo(int position){
+        hsv.smoothScrollTo( position,50);
+    }
+
+    public int getScrollPosition(){
+        return hsv.getScrollX();
+    }
+
+    public interface OnScrollListener{
+        void onScrollChange(int scrollX);
+    }
+
+    @Override
+    public void onRangeSelected(TimelineTime from, TimelineTime to) {
+        if(mlistener != null) {
+            mlistener.onRangeSelected(from, to);
+        }
+    }
+
+    @Override
+    public void onRangeDeselected(TimelineTime from, TimelineTime to) {
+        if(mlistener != null) {
+            mlistener.onRangeDeselected(from, to);
+        }
+    }
+
+    public class Item{
+        private int firstLineColor;
+        private int secondLineColor;
+        private int position;
+
+        public Item(int firstLineColor, int secondLineColor, int position){
+            this.firstLineColor = firstLineColor;
+            this.secondLineColor = secondLineColor;
+            this.position = position;
+        }
+
+        public int getFirstLineColor() {
+            return firstLineColor;
+        }
+
+        public int getSecondLineColor() {
+            return secondLineColor;
+        }
+
+        public void setFirstLineColor( int firstLineColor) {
+            this.firstLineColor = firstLineColor;
+        }
+
+        public void setSecondLineColor(int secondLineColor) {
+            this.secondLineColor = secondLineColor;
+        }
+
+        public int getPosition() {
+            return position;
+        }
+
+    }
+
+
+
+}
