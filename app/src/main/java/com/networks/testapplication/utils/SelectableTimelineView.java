@@ -17,6 +17,7 @@ import org.threeten.bp.LocalTime;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -34,7 +35,11 @@ public class SelectableTimelineView extends FrameLayout implements SelectableTim
 
     private OnRangeStateChangeListener mlistener;
 
-    private ArrayList<SelectableTimelinePoint> selectedRanges = new ArrayList<>();
+    private HashSet<SelectableTimelinePoint> selectedRanges = new HashSet<>();
+
+    private TimelineTime selectRangeStartTime;
+
+    private TimelineTime selectRangeEndTime;
 
     public SelectableTimelineView(Context context){
         super(context);
@@ -164,25 +169,22 @@ public class SelectableTimelineView extends FrameLayout implements SelectableTim
 
 
         boolean isContinuing = selectedRanges.isEmpty();
-        for(SelectableTimelinePoint selectedPoint: selectedRanges){
-            TimelineTime startTime = selectedPoint.getSelectedStartTime();
-            TimelineTime endTime = selectedPoint.getSelectedEndTime();
 
-            if(to.equals(startTime) || from.equals(endTime) ){
-                isContinuing = true;
-                break;
-            }
+        if(to.equals(selectRangeStartTime) || from.equals(selectRangeEndTime) ){
+            isContinuing = true;
         }
 
         if(!isContinuing) {
-            ArrayList<SelectableTimelinePoint> pointsToDeselect = new ArrayList<>();
-            pointsToDeselect.addAll(selectedRanges);
-            selectedRanges.clear();
-            for(SelectableTimelinePoint selectedPoint: pointsToDeselect){
-                if(selectedPoint.getItem().position >0) selectedPoint.deselectFirstRange();
-                if(selectedPoint.getItem().position <24) selectedPoint.deselectSecondRange();
-            }
+            deselectAll();
 
+        }
+
+        if(selectRangeStartTime == null || from.isBefore(selectRangeStartTime)){
+            selectRangeStartTime = from;
+        }
+
+        if(selectRangeEndTime == null || to.isAfter(selectRangeEndTime)){
+            selectRangeEndTime = to;
         }
 
         selectedRanges.add(point);
@@ -191,12 +193,43 @@ public class SelectableTimelineView extends FrameLayout implements SelectableTim
         }
     }
 
+    private void deselectAll(){
+        ArrayList<SelectableTimelinePoint> pointsToDeselect = new ArrayList<>();
+        pointsToDeselect.addAll(selectedRanges);
+        selectedRanges.clear();
+        selectRangeEndTime = null;
+        selectRangeStartTime = null;
+        for(SelectableTimelinePoint selectedPoint: pointsToDeselect){
+            if(selectedPoint.getItem().position >0) selectedPoint.deselectFirstRange();
+            if(selectedPoint.getItem().position <24) selectedPoint.deselectSecondRange();
+        }
+    }
+
     @Override
     public void onRangeDeselected(SelectableTimelinePoint point,
                                   TimelineTime from, TimelineTime to) {
 
+        boolean isMid;
+        if(selectedRanges.isEmpty() || from.equals(selectRangeStartTime) || to.equals(selectRangeEndTime) ){
+            isMid = false;
+        }else {
+            isMid = true;
+        }
+
+        if(isMid) {
+            deselectAll();
+        }
+
         if(!point.isFirstRangeSelected() && !point.isSecondRangeSelected()){
             selectedRanges.remove(point);
+        }
+
+        if(from.equals(selectRangeStartTime)){
+            selectRangeStartTime = to;
+        }
+
+        if(to.equals(selectRangeEndTime)){
+            selectRangeEndTime = from;
         }
 
         if(mlistener != null) {

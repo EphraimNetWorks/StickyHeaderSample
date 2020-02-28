@@ -206,12 +206,13 @@ public class SelectableTimelinePoint extends FrameLayout {
             verticalLineExtension.setBackgroundColor(unselectableColor);
         }
 
+        isFirstRangeSelected = false;
+
         if (mlistener != null) {
             mlistener.onRangeDeselected(this,
                     new TimelineTime(mItem.getPosition() - 1, 30),
                     new TimelineTime(mItem.getPosition(), 0));
         }
-        isFirstRangeSelected = false;
     }
 
     public void deselectSecondRange(){
@@ -223,12 +224,13 @@ public class SelectableTimelinePoint extends FrameLayout {
             verticalLineExtension.setBackgroundColor(unselectableColor);
         }
 
+        isSecondRangeSelected = false;
+
         if (mlistener != null) {
             mlistener.onRangeDeselected(this,
                     new TimelineTime(mItem.getPosition(), 0),
                     new TimelineTime(mItem.getPosition(), 30));
         }
-        isSecondRangeSelected = false;
 
     }
 

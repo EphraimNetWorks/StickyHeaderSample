@@ -30,6 +30,31 @@ public class TimelineTime {
         return minute;
     }
 
+    public boolean isBefore(TimelineTime time){
+        if(time == null) return false;
+        if(hour < time.hour){
+            return true;
+        }
+
+        if(time.hour == hour && minute< time.minute){
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isAfter(TimelineTime time){
+
+        if(time == null) return false;
+        if(hour > time.hour){
+            return true;
+        }
+
+        if(time.hour == hour && minute> time.minute){
+            return true;
+        }
+        return false;
+    }
+
     @Override
     public boolean equals(@Nullable Object obj) {
         boolean equals = false;
