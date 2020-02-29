@@ -16,11 +16,8 @@ import com.networks.testapplication.R;
 import org.threeten.bp.LocalTime;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 public class SelectableTimelineView extends FrameLayout implements SelectableTimelinePoint.OnPointRangeStateChangeListener {
 
@@ -117,12 +114,43 @@ public class SelectableTimelineView extends FrameLayout implements SelectableTim
             timelineLinearLayout.addView(timelinePoint);
         }
 
+
         if(scrollToCurrentTime) {
+
+            selectDefaultRange();
+
             new Handler().postDelayed(() -> {
+
                 LocalTime time = LocalTime.now();
                 scrollToTime(new TimelineTime(time.getHour(), time.getMinute()));
             }, 100);
         }
+    }
+
+    private void selectDefaultRange(){
+
+        LocalTime time = LocalTime.now();
+        int position = time.getHour()+ 1;
+        boolean startFromFirst = time.getMinute()<30;
+
+        while (position<timelineLinearLayout.getChildCount())  {
+            SelectableTimelinePoint point = (SelectableTimelinePoint) timelineLinearLayout.getChildAt(position);
+            if(startFromFirst) {
+                if (point.getItem().getFirstLineColor() != unselectableColor){
+                    point.selectFirstRange();
+                    break;
+                }
+            }
+            if (point.getItem().getSecondLineColor() != unselectableColor && position<24){
+                point.selectSecondRange();
+                break;
+            }
+
+            position++;
+            startFromFirst = true;
+
+        }
+
     }
 
 
@@ -144,6 +172,14 @@ public class SelectableTimelineView extends FrameLayout implements SelectableTim
     public void setUnselectableColor(int color){
 
         unselectableColor = color;
+    }
+
+    public TimelineTime getSelectedRangeEndTime() {
+        return selectRangeEndTime;
+    }
+
+    public TimelineTime getSelectedRangeStartTime() {
+        return selectRangeStartTime;
     }
 
     public void scrollToTime(TimelineTime time){
@@ -200,8 +236,12 @@ public class SelectableTimelineView extends FrameLayout implements SelectableTim
         selectRangeEndTime = null;
         selectRangeStartTime = null;
         for(SelectableTimelinePoint selectedPoint: pointsToDeselect){
-            if(selectedPoint.getItem().position >0) selectedPoint.deselectFirstRange();
-            if(selectedPoint.getItem().position <24) selectedPoint.deselectSecondRange();
+            if(selectedPoint.getItem().position >0 && selectedPoint.getItem().getFirstLineColor() != unselectableColor){
+                selectedPoint.deselectFirstRange();
+            }
+            if(selectedPoint.getItem().position <24 && selectedPoint.getItem().getSecondLineColor()!= unselectableColor){
+                selectedPoint.deselectSecondRange();
+            }
         }
     }
 
@@ -224,11 +264,15 @@ public class SelectableTimelineView extends FrameLayout implements SelectableTim
             selectedRanges.remove(point);
         }
 
-        if(from.equals(selectRangeStartTime)){
+        if(selectedRanges.isEmpty()) {
+            selectRangeStartTime = null;
+        }else if(from.equals(selectRangeStartTime)){
             selectRangeStartTime = to;
         }
 
-        if(to.equals(selectRangeEndTime)){
+        if(selectedRanges.isEmpty()) {
+            selectRangeEndTime = null;
+        }else if(to.equals(selectRangeEndTime)){
             selectRangeEndTime = from;
         }
 

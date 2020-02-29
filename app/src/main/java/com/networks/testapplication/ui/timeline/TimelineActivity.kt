@@ -30,7 +30,7 @@ class TimelineActivity : AppCompatActivity(), ItemScrollChangeListener{
 
         val ranges = arrayListOf(
             TimelineRange(TimelineTime(3,30), TimelineTime(4,30)),
-                    TimelineRange(TimelineTime(11,0), TimelineTime(14,30))
+                    TimelineRange(TimelineTime(11,0), TimelineTime(14,0))
         )
 
         selectable_timeline_view.setSelectedColor(ContextCompat.getColor(this, R.color.colorAccent))
@@ -39,12 +39,19 @@ class TimelineActivity : AppCompatActivity(), ItemScrollChangeListener{
         selectable_timeline_view.setOnRangeSelectedListener(object : OnRangeStateChangeListener{
             override fun onRangeSelected(from: TimelineTime, to: TimelineTime) {
 
+                Toast.makeText(this@TimelineActivity,
+                    "Range ${selectable_timeline_view.selectedRangeStartTime.hour}:${selectable_timeline_view.selectedRangeStartTime.minute} to ${selectable_timeline_view.selectedRangeEndTime.hour}:${selectable_timeline_view.selectedRangeEndTime.minute} Selected",
+                    Toast.LENGTH_LONG).show()
 //                Toast.makeText(this@TimelineActivity,
 //                    "Range ${from.hour}:${from.minute} to ${to.hour}:${to.minute} Selected",
 //                    Toast.LENGTH_LONG).show()
             }
 
             override fun onRangeDeselected(from: TimelineTime, to: TimelineTime) {
+
+                Toast.makeText(this@TimelineActivity,
+                    "Range ${selectable_timeline_view.selectedRangeStartTime?.hour?:"null"}:${selectable_timeline_view.selectedRangeStartTime?.minute?:"null"} to ${selectable_timeline_view.selectedRangeEndTime?.hour?:"null"}:${selectable_timeline_view.selectedRangeEndTime?.minute?:"null"} Selected",
+                    Toast.LENGTH_LONG).show()
 //                Toast.makeText(this@TimelineActivity,
 //                    "Range ${from.hour}:${from.minute} to ${to.hour}:${to.minute} Deselected",
 //                    Toast.LENGTH_LONG).show()
