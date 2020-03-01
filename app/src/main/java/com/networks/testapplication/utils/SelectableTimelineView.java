@@ -19,7 +19,8 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-public class SelectableTimelineView extends FrameLayout implements SelectableTimelinePoint.OnPointRangeStateChangeListener {
+public class SelectableTimelineView extends FrameLayout implements
+        SelectableTimelinePoint.OnPointRangeStateChangeListener, SelectableTimelinePoint.DataInterface {
 
     private int selectedColor = Color.GREEN;
     private int unselectableColor = Color.LTGRAY;
@@ -27,6 +28,9 @@ public class SelectableTimelineView extends FrameLayout implements SelectableTim
 
     private LinearLayout timelineLinearLayout;
     private ObservableHorizontalScrollView hsv;
+
+    private int maximumSelectableRanges = 48;
+    private int selectedRangesCount = 0;
 
     private Context ctx;
 
@@ -109,6 +113,7 @@ public class SelectableTimelineView extends FrameLayout implements SelectableTim
             timelinePoint.setDefaultColor(defaultColor);
             timelinePoint.setSelectedColor(selectedColor);
             timelinePoint.setOnRangeSelectedListener(this);
+            timelinePoint.setDataInterface(this);
             timelinePoint.setItem(item,25);
 
             timelineLinearLayout.addView(timelinePoint);
@@ -204,6 +209,7 @@ public class SelectableTimelineView extends FrameLayout implements SelectableTim
                                 TimelineTime from, TimelineTime to) {
 
 
+
         boolean isContinuing = selectedRanges.isEmpty();
 
         if(to.equals(selectRangeStartTime) || from.equals(selectRangeEndTime) ){
@@ -222,6 +228,8 @@ public class SelectableTimelineView extends FrameLayout implements SelectableTim
         if(selectRangeEndTime == null || to.isAfter(selectRangeEndTime)){
             selectRangeEndTime = to;
         }
+
+        selectedRangesCount++;
 
         selectedRanges.add(point);
         if(mlistener != null) {
@@ -250,35 +258,51 @@ public class SelectableTimelineView extends FrameLayout implements SelectableTim
                                   TimelineTime from, TimelineTime to) {
 
         boolean isMid;
-        if(selectedRanges.isEmpty() || from.equals(selectRangeStartTime) || to.equals(selectRangeEndTime) ){
+        if (selectedRanges.isEmpty() || from.equals(selectRangeStartTime) || to.equals(selectRangeEndTime)) {
             isMid = false;
-        }else {
+        } else {
             isMid = true;
         }
 
-        if(isMid) {
+        if (isMid) {
             deselectAll();
         }
 
-        if(!point.isFirstRangeSelected() && !point.isSecondRangeSelected()){
+        if (!point.isFirstRangeSelected() && !point.isSecondRangeSelected()) {
             selectedRanges.remove(point);
         }
 
-        if(selectedRanges.isEmpty()) {
+        if (selectedRanges.isEmpty()) {
             selectRangeStartTime = null;
-        }else if(from.equals(selectRangeStartTime)){
+        } else if (from.equals(selectRangeStartTime)) {
             selectRangeStartTime = to;
         }
 
-        if(selectedRanges.isEmpty()) {
+        if (selectedRanges.isEmpty()) {
             selectRangeEndTime = null;
-        }else if(to.equals(selectRangeEndTime)){
+        } else if (to.equals(selectRangeEndTime)) {
             selectRangeEndTime = from;
         }
 
-        if(mlistener != null) {
+        if (selectedRangesCount > 0) selectedRangesCount--;
+
+        if (mlistener != null) {
             mlistener.onRangeDeselected(from, to);
         }
+    }
+
+    public void setMaximumSelectableRanges(int maximumSelectableRanges) {
+        this.maximumSelectableRanges = maximumSelectableRanges;
+    }
+
+    @Override
+    public int getMaxRangeCount() {
+        return maximumSelectableRanges;
+    }
+
+    @Override
+    public int getSelectedRangeCount() {
+        return selectedRangesCount;
     }
 
     public class Item{

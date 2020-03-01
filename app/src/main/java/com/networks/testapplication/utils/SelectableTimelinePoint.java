@@ -34,6 +34,7 @@ public class SelectableTimelinePoint extends FrameLayout {
     private boolean isSecondRangeSelected = false;
 
     private OnPointRangeStateChangeListener mlistener;
+    private DataInterface dataInterface;
 
     private SelectableTimelineView.Item mItem;
 
@@ -120,6 +121,10 @@ public class SelectableTimelinePoint extends FrameLayout {
         mlistener = listener;
     }
 
+    public void setDataInterface(DataInterface dataInterface){
+        this.dataInterface = dataInterface;
+    }
+
     public boolean isFirstRangeSelected() {
         return isFirstRangeSelected;
     }
@@ -134,7 +139,6 @@ public class SelectableTimelinePoint extends FrameLayout {
                 if (isFirstRangeSelected) {
                     deselectFirstRange();
                 }else {
-
                     selectFirstRange();
                 }
             });
@@ -155,6 +159,11 @@ public class SelectableTimelinePoint extends FrameLayout {
     }
 
     public void selectFirstRange(){
+
+        if(dataInterface.getMaxRangeCount() <= dataInterface.getSelectedRangeCount()) {
+            return;
+        }
+
         verticalLine.setBackgroundColor(selectedColor);
         verticalLineExtension.setBackgroundColor(selectedColor);
         firstRangeView.setBackgroundColor(ColorUtils.setAlphaComponent(selectedColor, 50));
@@ -183,7 +192,9 @@ public class SelectableTimelinePoint extends FrameLayout {
     }
 
     public void selectSecondRange(){
-
+        if(dataInterface.getMaxRangeCount() <= dataInterface.getSelectedRangeCount()) {
+            return;
+        }
         secondRangeView.setBackgroundColor(ColorUtils.setAlphaComponent(selectedColor, 50));
         verticalLine.setBackgroundColor(selectedColor);
         verticalLineExtension.setBackgroundColor(selectedColor);
@@ -268,6 +279,11 @@ public class SelectableTimelinePoint extends FrameLayout {
     public interface OnPointRangeStateChangeListener{
         void onRangeSelected(SelectableTimelinePoint point, TimelineTime from, TimelineTime to);
         void onRangeDeselected(SelectableTimelinePoint point, TimelineTime from, TimelineTime to);
+    }
+
+    public interface DataInterface{
+        int getMaxRangeCount();
+        int getSelectedRangeCount();
     }
 
 }
