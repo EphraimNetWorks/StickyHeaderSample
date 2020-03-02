@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 
 public class SelectableTimelineView extends FrameLayout implements
-        SelectableTimelinePoint.OnPointRangeStateChangeListener, SelectableTimelinePoint.DataInterface {
+        SelectableTimelinePoint.OnPointRangeStateChangeListener{
 
     private int selectedColor = Color.GREEN;
     private int unselectableColor = Color.LTGRAY;
@@ -113,7 +113,6 @@ public class SelectableTimelineView extends FrameLayout implements
             timelinePoint.setDefaultColor(defaultColor);
             timelinePoint.setSelectedColor(selectedColor);
             timelinePoint.setOnRangeSelectedListener(this);
-            timelinePoint.setDataInterface(this);
             timelinePoint.setItem(item,25);
 
             timelineLinearLayout.addView(timelinePoint);
@@ -154,6 +153,32 @@ public class SelectableTimelineView extends FrameLayout implements
             position++;
             startFromFirst = true;
 
+        }
+
+    }
+
+    private void deselectStartRange(){
+
+        int position = selectRangeStartTime.getHour()+ (selectRangeStartTime.getMinute()>=30?1:0);
+
+        SelectableTimelinePoint point = (SelectableTimelinePoint) timelineLinearLayout.getChildAt(position);
+        if(point.isFirstRangeSelected()) {
+            point.deselectFirstRange();
+        }else {
+            point.deselectSecondRange();
+        }
+
+    }
+
+    private void deselectEndRange(){
+
+        int position = selectRangeEndTime.getHour()+ (selectRangeEndTime.getMinute()>30?1:0);
+
+        SelectableTimelinePoint point = (SelectableTimelinePoint) timelineLinearLayout.getChildAt(position);
+        if(point.isSecondRangeSelected()) {
+            point.deselectSecondRange();
+        }else {
+            point.deselectFirstRange();
         }
 
     }
@@ -220,16 +245,23 @@ public class SelectableTimelineView extends FrameLayout implements
             deselectAll();
 
         }
+        selectedRangesCount++;
 
         if(selectRangeStartTime == null || from.isBefore(selectRangeStartTime)){
             selectRangeStartTime = from;
+
+            if(maximumSelectableRanges < selectedRangesCount){
+                deselectEndRange();
+            }
         }
 
         if(selectRangeEndTime == null || to.isAfter(selectRangeEndTime)){
             selectRangeEndTime = to;
+            if(maximumSelectableRanges < selectedRangesCount){
+                deselectStartRange();
+            }
         }
 
-        selectedRangesCount++;
 
         selectedRanges.add(point);
         if(mlistener != null) {
@@ -293,16 +325,6 @@ public class SelectableTimelineView extends FrameLayout implements
 
     public void setMaximumSelectableRanges(int maximumSelectableRanges) {
         this.maximumSelectableRanges = maximumSelectableRanges;
-    }
-
-    @Override
-    public int getMaxRangeCount() {
-        return maximumSelectableRanges;
-    }
-
-    @Override
-    public int getSelectedRangeCount() {
-        return selectedRangesCount;
     }
 
     public class Item{

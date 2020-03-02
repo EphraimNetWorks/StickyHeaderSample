@@ -35,7 +35,7 @@ class TimelineActivity : AppCompatActivity(), ItemScrollChangeListener{
 
         selectable_timeline_view.setSelectedColor(ContextCompat.getColor(this, R.color.colorAccent))
 
-        selectable_timeline_view.setMaximumSelectableRanges(2)
+        selectable_timeline_view.setMaximumSelectableRanges(3)
         selectable_timeline_view.setUnselectableRanges(ranges,true)
         selectable_timeline_view.setOnRangeSelectedListener(object : OnRangeStateChangeListener{
             override fun onRangeSelected(from: TimelineTime, to: TimelineTime) {
