@@ -246,6 +246,7 @@ public class SelectableTimelineView extends FrameLayout implements
 
         }
         selectedRangesCount++;
+        selectedRanges.add(point);
 
         if(selectRangeStartTime == null || from.isBefore(selectRangeStartTime)){
             selectRangeStartTime = from;
@@ -263,7 +264,6 @@ public class SelectableTimelineView extends FrameLayout implements
         }
 
 
-        selectedRanges.add(point);
         if(mlistener != null) {
             mlistener.onRangeSelected(from, to);
         }

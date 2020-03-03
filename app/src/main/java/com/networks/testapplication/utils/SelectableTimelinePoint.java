@@ -137,6 +137,7 @@ public class SelectableTimelinePoint extends FrameLayout {
                     selectFirstRange();
                 }
             });
+
         }
     }
 
@@ -155,6 +156,7 @@ public class SelectableTimelinePoint extends FrameLayout {
 
     public void selectFirstRange(){
 
+        isFirstRangeSelected = true;
         verticalLine.setBackgroundColor(selectedColor);
         verticalLineExtension.setBackgroundColor(selectedColor);
         firstRangeView.setBackgroundColor(ColorUtils.setAlphaComponent(selectedColor, 50));
@@ -163,7 +165,6 @@ public class SelectableTimelinePoint extends FrameLayout {
                     new TimelineTime(mItem.getPosition() - 1, 30),
                     new TimelineTime(mItem.getPosition(), 0));
         }
-        isFirstRangeSelected = true;
     }
 
     public TimelineTime getSelectedStartTime(){
@@ -184,6 +185,8 @@ public class SelectableTimelinePoint extends FrameLayout {
 
     public void selectSecondRange(){
 
+        isSecondRangeSelected = true;
+
         secondRangeView.setBackgroundColor(ColorUtils.setAlphaComponent(selectedColor, 50));
         verticalLine.setBackgroundColor(selectedColor);
         verticalLineExtension.setBackgroundColor(selectedColor);
@@ -193,7 +196,6 @@ public class SelectableTimelinePoint extends FrameLayout {
                     new TimelineTime(mItem.getPosition(), 0),
                     new TimelineTime(mItem.getPosition(), 30));
         }
-        isSecondRangeSelected = true;
     }
 
 
