@@ -135,6 +135,9 @@ public class SelectableTimelineView extends FrameLayout implements
     private void selectDefaultRange(){
 
         LocalTime time = LocalTime.now();
+
+        time = LocalTime.of(time.getHour(), time.getMinute()+(5-time.getMinute()%5));
+
         int position = time.getHour()+ (time.getMinute()<30?0:1);
         boolean startFromFirst = time.getMinute()>=30;
         double ratioToSelect = time.getMinute()<=30? time.getMinute()/30.0: (time.getMinute()-30)/30.0;
