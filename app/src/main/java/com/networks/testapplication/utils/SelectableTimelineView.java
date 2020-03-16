@@ -2,10 +2,11 @@ package com.networks.testapplication.utils;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.util.AttributeSet;
-import android.util.Pair;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
@@ -134,18 +135,25 @@ public class SelectableTimelineView extends FrameLayout implements
     private void selectDefaultRange(){
 
         LocalTime time = LocalTime.now();
-        int position = time.getHour()+ 1;
-        boolean startFromFirst = time.getMinute()<30;
+        int position = time.getHour()+ (time.getMinute()<30?0:1);
+        boolean startFromFirst = time.getMinute()>=30;
+        double ratioToSelect = time.getMinute()<=30? time.getMinute()/30.0: (time.getMinute()-30)/30.0;
 
         while (position<timelineLinearLayout.getChildCount())  {
             SelectableTimelinePoint point = (SelectableTimelinePoint) timelineLinearLayout.getChildAt(position);
+
+
             if(startFromFirst) {
                 if (point.getItem().getFirstLineColor() != unselectableColor){
+                    point.setFirstRangeSelectablePercentage(ratioToSelect);
+                    point.setCustomFirstStartTime(new TimelineTime(time.getHour(),time.getMinute()));
                     point.selectFirstRange();
                     break;
                 }
             }
             if (point.getItem().getSecondLineColor() != unselectableColor && position<24){
+                point.setSecondSelectablePercentage(ratioToSelect);
+                point.setCustomSecondStartTime(new TimelineTime(time.getHour(),time.getMinute()));
                 point.selectSecondRange();
                 break;
             }
@@ -243,8 +251,8 @@ public class SelectableTimelineView extends FrameLayout implements
 
         if(!isContinuing) {
             deselectAll();
-
         }
+
         selectedRangesCount++;
         selectedRanges.add(point);
 
@@ -359,5 +367,31 @@ public class SelectableTimelineView extends FrameLayout implements
         }
 
     }
+
+    public View findViewAt( int x, int y) {
+        return findViewAt(timelineLinearLayout, x, y);
+    }
+
+    public View findViewAt(ViewGroup viewGroup, int x, int y) {
+        for(int i = 0; i < viewGroup.getChildCount(); i++) {
+            View child = viewGroup.getChildAt(i);
+            if (child instanceof ViewGroup) {
+                View foundView = findViewAt((ViewGroup) child, x, y);
+                if (foundView != null && foundView.isShown()) {
+                    return foundView;
+                }
+            } else {
+                int[] location = new int[2];
+                child.getLocationOnScreen(location);
+                Rect rect = new Rect(location[0], location[1], location[0] + child.getWidth(), location[1] + child.getHeight());
+                if (rect.contains(x, y)) {
+                    return child;
+                }
+            }
+        }
+
+        return null;
+    }
+
 
 }

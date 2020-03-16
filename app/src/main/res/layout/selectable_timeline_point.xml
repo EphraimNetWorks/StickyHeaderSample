@@ -10,9 +10,9 @@
         android:layout_height="match_parent">
 
 
-        <View
+        <com.networks.testapplication.utils.RangeView
             android:id="@+id/first_range_view"
-            android:layout_width="0dp"
+            android:layout_width="40dp"
             android:layout_height="40dp"
             app:layout_goneMarginStart="20dp"
             app:layout_goneMarginEnd="20dp"
@@ -82,9 +82,9 @@
             app:layout_constraintStart_toStartOf="@id/vertical_line"
             app:layout_constraintEnd_toEndOf="@id/vertical_line"/>
 
-        <View
+        <com.networks.testapplication.utils.RangeView
             android:id="@+id/second_range_view"
-            android:layout_width="0dp"
+            android:layout_width="40dp"
             android:layout_height="40dp"
             app:layout_goneMarginStart="20dp"
             app:layout_goneMarginEnd="20dp"

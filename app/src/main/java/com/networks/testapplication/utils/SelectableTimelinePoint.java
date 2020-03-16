@@ -18,24 +18,24 @@ public class SelectableTimelinePoint extends FrameLayout {
 
     private View firstLine;
     private View verticalFirstLine;
-    private View firstRangeView;
+    private RangeView firstRangeView;
     private View secondLine;
-    private View secondRangeView;
+    private RangeView secondRangeView;
     private View verticalLine;
     private View verticalLineExtension;
     private TextView textview;
-
 
     private int selectedColor = Color.GREEN;
     private int unselectableColor = Color.LTGRAY;
     private int defaultColor = Color.TRANSPARENT;
 
-    private boolean isFirstRangeSelected = false;
-    private boolean isSecondRangeSelected = false;
 
     private OnPointRangeStateChangeListener mlistener;
 
     private SelectableTimelineView.Item mItem;
+
+    private TimelineTime mCustomFirstStartTime = null;
+    private TimelineTime mCustomSecondStartTime = null;
 
     public SelectableTimelinePoint(Context context){
         super(context);
@@ -60,6 +60,13 @@ public class SelectableTimelinePoint extends FrameLayout {
         addView(view);
     }
 
+    public void setFirstRangeSelectablePercentage(double ratioToSelect){
+        firstRangeView.setSelectableRangePercentage(ratioToSelect, RangeView.SelectableSide.RIGHT);
+    }
+
+    public void setSecondSelectablePercentage(double ratioToSelect){
+        secondRangeView.setSelectableRangePercentage(ratioToSelect, RangeView.SelectableSide.RIGHT);
+    }
 
     public void setItem(SelectableTimelineView.Item item, int count){
 
@@ -121,17 +128,24 @@ public class SelectableTimelinePoint extends FrameLayout {
     }
 
     public boolean isFirstRangeSelected() {
-        return isFirstRangeSelected;
+        return firstRangeView.isRangeSelected();
     }
 
     public boolean isSecondRangeSelected() {
-        return isSecondRangeSelected;
+        return secondRangeView.isRangeSelected();
+    }
+
+    public void setCustomFirstStartTime(TimelineTime mCustomStartTime) {
+        this.mCustomFirstStartTime = mCustomStartTime;
+    }
+    public void setCustomSecondStartTime(TimelineTime mCustomStartTime) {
+        this.mCustomSecondStartTime = mCustomStartTime;
     }
 
     private void setupFirstListener(SelectableTimelineView.Item item){
         if(item.getFirstLineColor() == selectedColor) {
             firstRangeView.setOnClickListener(view -> {
-                if (isFirstRangeSelected) {
+                if (firstRangeView.isRangeSelected()) {
                     deselectFirstRange();
                 }else {
                     selectFirstRange();
@@ -144,7 +158,7 @@ public class SelectableTimelinePoint extends FrameLayout {
     private void setupSecondListener(SelectableTimelineView.Item item){
         if(item.getSecondLineColor() == selectedColor) {
             secondRangeView.setOnClickListener(view -> {
-                if (isSecondRangeSelected) {
+                if (secondRangeView.isRangeSelected()) {
                     deselectSecondRange();
                 }else {
 
@@ -156,28 +170,28 @@ public class SelectableTimelinePoint extends FrameLayout {
 
     public void selectFirstRange(){
 
-        isFirstRangeSelected = true;
         verticalLine.setBackgroundColor(selectedColor);
         verticalLineExtension.setBackgroundColor(selectedColor);
-        firstRangeView.setBackgroundColor(ColorUtils.setAlphaComponent(selectedColor, 50));
+        firstRangeView.select();
+
         if (mlistener != null) {
             mlistener.onRangeSelected(this,
-                    new TimelineTime(mItem.getPosition() - 1, 30),
+                    mCustomFirstStartTime!=null ? mCustomFirstStartTime :new TimelineTime(mItem.getPosition() - 1, 30),
                     new TimelineTime(mItem.getPosition(), 0));
         }
     }
 
     public TimelineTime getSelectedStartTime(){
         TimelineTime time;
-        if(isFirstRangeSelected)
-            time = new TimelineTime(mItem.getPosition() - 1, 30);
-        else time = new TimelineTime(mItem.getPosition(), 0);
+        if(firstRangeView.isRangeSelected())
+            time = mCustomFirstStartTime!=null ? mCustomFirstStartTime :new TimelineTime(mItem.getPosition() - 1, 30);
+        else time = mCustomSecondStartTime!=null ? mCustomSecondStartTime :new TimelineTime(mItem.getPosition(), 0);
         return time;
     }
 
     public TimelineTime getSelectedEndTime(){
         TimelineTime time;
-        if(!isSecondRangeSelected)
+        if(!secondRangeView.isRangeSelected())
             time = new TimelineTime(mItem.getPosition(), 0);
         else time = new TimelineTime(mItem.getPosition(), 30);
         return time;
@@ -185,15 +199,13 @@ public class SelectableTimelinePoint extends FrameLayout {
 
     public void selectSecondRange(){
 
-        isSecondRangeSelected = true;
-
-        secondRangeView.setBackgroundColor(ColorUtils.setAlphaComponent(selectedColor, 50));
+        secondRangeView.select();
         verticalLine.setBackgroundColor(selectedColor);
         verticalLineExtension.setBackgroundColor(selectedColor);
 
         if (mlistener != null) {
             mlistener.onRangeSelected(this,
-                    new TimelineTime(mItem.getPosition(), 0),
+                    mCustomSecondStartTime!=null ? mCustomSecondStartTime :new TimelineTime(mItem.getPosition(), 0),
                     new TimelineTime(mItem.getPosition(), 30));
         }
     }
@@ -201,36 +213,32 @@ public class SelectableTimelinePoint extends FrameLayout {
 
 
     public void deselectFirstRange(){
-        firstRangeView.setBackgroundColor(defaultColor);
+        firstRangeView.deselect();
 
-        if(!isSecondRangeSelected) {
+        if(!secondRangeView.isRangeSelected()) {
             verticalLine.setBackgroundColor(unselectableColor);
             verticalLineExtension.setBackgroundColor(unselectableColor);
         }
 
-        isFirstRangeSelected = false;
-
         if (mlistener != null) {
             mlistener.onRangeDeselected(this,
-                    new TimelineTime(mItem.getPosition() - 1, 30),
+                    mCustomFirstStartTime!=null ? mCustomFirstStartTime :new TimelineTime(mItem.getPosition() - 1, 30),
                     new TimelineTime(mItem.getPosition(), 0));
         }
     }
 
     public void deselectSecondRange(){
 
-        secondRangeView.setBackgroundColor(defaultColor);
+        secondRangeView.deselect();
 
-        if(!isFirstRangeSelected) {
+        if(!firstRangeView.isRangeSelected()) {
             verticalLine.setBackgroundColor(unselectableColor);
             verticalLineExtension.setBackgroundColor(unselectableColor);
         }
 
-        isSecondRangeSelected = false;
-
         if (mlistener != null) {
             mlistener.onRangeDeselected(this,
-                    new TimelineTime(mItem.getPosition(), 0),
+                    mCustomSecondStartTime!=null ? mCustomSecondStartTime :new TimelineTime(mItem.getPosition(), 0),
                     new TimelineTime(mItem.getPosition(), 30));
         }
 
@@ -255,21 +263,39 @@ public class SelectableTimelinePoint extends FrameLayout {
     public void setSelectedColor(int color){
 
        selectedColor = color;
+       firstRangeView.setSelectedColor(color);
+       secondRangeView.setSelectedColor(color);
     }
 
     public void setUnselectableColor(int color){
 
         unselectableColor = color;
+
+        if(mItem!= null && mItem.getFirstLineColor() == unselectableColor){
+            firstRangeView.setDefaultColor(color);
+        }
+        if(mItem!= null && mItem.getSecondLineColor() == unselectableColor){
+            secondRangeView.setDefaultColor(color);
+        }
+
     }
 
     public void setDefaultColor(int color){
 
         defaultColor = color;
+
+        if(mItem!= null && mItem.getFirstLineColor() == defaultColor){
+            firstRangeView.setDefaultColor(color);
+        }
+        if(mItem!= null && mItem.getSecondLineColor() == defaultColor){
+            secondRangeView.setDefaultColor(color);
+        }
     }
 
     public interface OnPointRangeStateChangeListener{
         void onRangeSelected(SelectableTimelinePoint point, TimelineTime from, TimelineTime to);
         void onRangeDeselected(SelectableTimelinePoint point, TimelineTime from, TimelineTime to);
     }
+
 
 }
