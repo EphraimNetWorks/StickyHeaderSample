@@ -136,11 +136,21 @@ public class SelectableTimelineView extends FrameLayout implements
 
         LocalTime time = LocalTime.now();
 
-        time = LocalTime.of(time.getHour(), time.getMinute()+(5-time.getMinute()%5));
+        int intervalIncrement = 5;
+        int approximatedHour = time.getHour() + ((time.getMinute()+intervalIncrement > 60)? 1:0);
+        int approximatedMinute = (time.getMinute()+(intervalIncrement-time.getMinute()%intervalIncrement))%60;
+        time = LocalTime.of(approximatedHour,approximatedMinute );
 
         int position = time.getHour()+ (time.getMinute()<30?0:1);
         boolean startFromFirst = time.getMinute()>=30;
-        double ratioToSelect = time.getMinute()<=30? time.getMinute()/30.0: (time.getMinute()-30)/30.0;
+        double unselectableRatio ;
+        if(time.getMinute()%30 == 0){
+           unselectableRatio = 0;
+        }else if(time.getMinute()<30){
+            unselectableRatio = time.getMinute()/30.0;
+        }else {
+            unselectableRatio = (time.getMinute()-30)/30.0;
+        }
 
         while (position<timelineLinearLayout.getChildCount())  {
             SelectableTimelinePoint point = (SelectableTimelinePoint) timelineLinearLayout.getChildAt(position);
@@ -148,14 +158,14 @@ public class SelectableTimelineView extends FrameLayout implements
 
             if(startFromFirst) {
                 if (point.getItem().getFirstLineColor() != unselectableColor){
-                    point.setFirstRangeSelectablePercentage(ratioToSelect);
+                    point.setFirstRangeSelectablePercentage(unselectableRatio);
                     point.setCustomFirstStartTime(new TimelineTime(time.getHour(),time.getMinute()));
                     point.selectFirstRange();
                     break;
                 }
             }
             if (point.getItem().getSecondLineColor() != unselectableColor && position<24){
-                point.setSecondSelectablePercentage(ratioToSelect);
+                point.setSecondSelectablePercentage(unselectableRatio);
                 point.setCustomSecondStartTime(new TimelineTime(time.getHour(),time.getMinute()));
                 point.selectSecondRange();
                 break;

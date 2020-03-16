@@ -60,12 +60,12 @@ public class SelectableTimelinePoint extends FrameLayout {
         addView(view);
     }
 
-    public void setFirstRangeSelectablePercentage(double ratioToSelect){
-        firstRangeView.setSelectableRangePercentage(ratioToSelect, RangeView.SelectableSide.RIGHT);
+    public void setFirstRangeSelectablePercentage(double unselectableRatio){
+        firstRangeView.setSelectableRangePercentage(unselectableRatio, RangeView.SelectableSide.RIGHT);
     }
 
-    public void setSecondSelectablePercentage(double ratioToSelect){
-        secondRangeView.setSelectableRangePercentage(ratioToSelect, RangeView.SelectableSide.RIGHT);
+    public void setSecondSelectablePercentage(double unselectableRatio){
+        secondRangeView.setSelectableRangePercentage(unselectableRatio, RangeView.SelectableSide.RIGHT);
     }
 
     public void setItem(SelectableTimelineView.Item item, int count){

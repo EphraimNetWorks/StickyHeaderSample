@@ -47,16 +47,16 @@ public class RangeView extends FrameLayout {
         addView(view);
     }
 
-    public void setSelectableRangePercentage(double ratioToSelect, SelectableSide selectableSide) {
+    public void setSelectableRangePercentage(double unselectableRatio, SelectableSide selectableSide) {
 
         float measuredWidth = convertDpToPixel(40f, getContext());
         RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) selectableView.getLayoutParams();
         if(selectableSide == SelectableSide.RIGHT) {
             layoutParams.setMarginEnd(0);
-            layoutParams.setMarginStart((int) (measuredWidth * ratioToSelect));
+            layoutParams.setMarginStart((int) (measuredWidth * unselectableRatio));
         }else {
             layoutParams.setMarginStart(0);
-            layoutParams.setMarginEnd((int) (measuredWidth * ratioToSelect));
+            layoutParams.setMarginEnd((int) (measuredWidth * unselectableRatio));
         }
 
         selectableView.setLayoutParams(layoutParams);
