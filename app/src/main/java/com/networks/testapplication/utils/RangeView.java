@@ -11,6 +11,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.graphics.ColorUtils;
 
 import com.networks.testapplication.R;
@@ -18,12 +19,14 @@ import com.networks.testapplication.R;
 public class RangeView extends FrameLayout {
 
 
-    private RelativeLayout parent;
+    private ConstraintLayout parent;
     private View selectableView;
+    private View unselectableView;
 
 
     private int mSelectedColor = Color.GREEN;
     private int mDefaultColor = Color.TRANSPARENT;
+    private int mUnselectedColor = Color.GRAY;
 
     private boolean isSelected = false;
 
@@ -42,7 +45,9 @@ public class RangeView extends FrameLayout {
 
         parent = view.findViewById(R.id.range_layout);
         selectableView = view.findViewById(R.id.selectable_range);
+        unselectableView = view.findViewById(R.id.unselectable_range);
 
+        unselectableView.setBackgroundColor(mUnselectedColor);
         parent.setBackgroundColor(mDefaultColor);
         addView(view);
     }
@@ -50,7 +55,8 @@ public class RangeView extends FrameLayout {
     public void setSelectableRangePercentage(double unselectableRatio, SelectableSide selectableSide) {
 
         float measuredWidth = convertDpToPixel(40f, getContext());
-        RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) selectableView.getLayoutParams();
+
+        ConstraintLayout.LayoutParams layoutParams = (ConstraintLayout.LayoutParams) selectableView.getLayoutParams();
         if(selectableSide == SelectableSide.RIGHT) {
             layoutParams.setMarginEnd(0);
             layoutParams.setMarginStart((int) (measuredWidth * unselectableRatio));
@@ -74,10 +80,16 @@ public class RangeView extends FrameLayout {
 
     public void setSelectedColor(int color){
 
-       mSelectedColor = color;
-       if(isSelected){
-           select();
-       }
+        mSelectedColor = color;
+        if(isSelected){
+            select();
+        }
+    }
+
+    public void setUnselectedColor(int color){
+
+        mUnselectedColor = color;
+        unselectableView.setBackgroundColor(mUnselectedColor);
     }
 
     public boolean isRangeSelected(){

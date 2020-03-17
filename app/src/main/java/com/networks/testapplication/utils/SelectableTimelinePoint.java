@@ -278,6 +278,8 @@ public class SelectableTimelinePoint extends FrameLayout {
             secondRangeView.setDefaultColor(color);
         }
 
+        firstRangeView.setUnselectedColor(color);
+        secondRangeView.setUnselectedColor(color);
     }
 
     public void setDefaultColor(int color){
