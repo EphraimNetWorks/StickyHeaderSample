@@ -178,6 +178,113 @@ public class SelectableTimelineView extends FrameLayout implements
 
     }
 
+    public void selectRange(TimelineRange rangeToSelect){
+
+        TimelineTime startTime = rangeToSelect.getStartTime();
+        TimelineTime endTime =  rangeToSelect.getEndTime();
+
+        int startPosition = startTime.getHour()+ (startTime.getMinute()<30?0:1);
+        int endPosition = endTime.getHour()+ (endTime.getMinute()<30?0:1);
+
+        boolean startFromFirst = startTime.getMinute()>=30;
+        boolean endAtFirst = endTime.getMinute()==0 || endTime.getMinute()>30;
+
+        for(int i = startPosition; i<endPosition+1; i++){
+
+            SelectableTimelinePoint point = (SelectableTimelinePoint) timelineLinearLayout.getChildAt(i);
+            if(i == startPosition) {
+                if(startFromFirst) {
+                    selectFirstRange(point);
+                }
+                if(endPosition >startPosition || (endPosition == startPosition && !endAtFirst)){
+                    selectSecondRange(point);
+                }
+            }else if(endAtFirst && i == endPosition){
+                selectFirstRange(point);
+            }else {
+                selectFirstRange(point);
+                selectSecondRange(point);
+            }
+
+        }
+
+    }
+
+    private void selectFirstRange(SelectableTimelinePoint point){
+        if (point.getItem().getFirstLineColor() != unselectableColor && !point.isFirstRangeSelected()){
+            point.selectFirstRange();
+        }
+    }
+
+    private void selectSecondRange(SelectableTimelinePoint point){
+        if (point.getItem().getFirstLineColor() != unselectableColor && !point.isSecondRangeSelected()){
+            point.selectSecondRange();
+        }
+    }
+
+    public void deselectRange(TimelineRange rangeToSelect){
+
+        TimelineTime startTime = rangeToSelect.getStartTime();
+        TimelineTime endTime =  rangeToSelect.getEndTime();
+
+        int startPosition = startTime.getHour()+ (startTime.getMinute()<30?0:1);
+        int endPosition = endTime.getHour()+ (endTime.getMinute()<30?0:1);
+
+        boolean startFromFirst = startTime.getMinute()>=30;
+        boolean endAtFirst = endTime.getMinute()==0 || endTime.getMinute()>30;
+
+        if(selectRangeEndTime.isAfter(endTime)){
+            deselectPoints(startPosition,endPosition,startFromFirst,endAtFirst);
+        }else {
+            inverseDeselectPoints(startPosition,endPosition,startFromFirst,endAtFirst);
+        }
+
+    }
+
+    private void deselectPoints(int startPosition, int endPosition,
+                                boolean startFromFirst, boolean endAtFirst){
+        for(int i = startPosition; i<endPosition+1; i++){
+            deselectPoint(i, startPosition, endPosition, startFromFirst, endAtFirst);
+        }
+    }
+
+    private void inverseDeselectPoints(int startPosition, int endPosition,
+                                       boolean startFromFirst, boolean endAtFirst){
+        for(int i = endPosition; i>startPosition-1; i--){
+            deselectPoint(i, startPosition, endPosition, startFromFirst, endAtFirst);
+        }
+    }
+
+    private void deselectPoint(int i , int startPosition, int endPosition,
+                               boolean startFromFirst, boolean endAtFirst){
+        SelectableTimelinePoint point = (SelectableTimelinePoint) timelineLinearLayout.getChildAt(i);
+        if(i == startPosition) {
+            if(startFromFirst) {
+                deselectFirstRange(point);
+            }
+            if(endPosition >startPosition || (endPosition == startPosition && !endAtFirst)){
+                deselectSecondRange(point);
+            }
+        }else if(endAtFirst && i == endPosition){
+            deselectFirstRange(point);
+        }else {
+            deselectFirstRange(point);
+            deselectSecondRange(point);
+        }
+    }
+
+    private void deselectFirstRange(SelectableTimelinePoint point){
+        if (point.getItem().getFirstLineColor() != unselectableColor && point.isFirstRangeSelected()){
+            point.deselectFirstRange();
+        }
+    }
+
+    private void deselectSecondRange(SelectableTimelinePoint point){
+        if (point.getItem().getFirstLineColor() != unselectableColor && point.isSecondRangeSelected()){
+            point.deselectSecondRange();
+        }
+    }
+
     private void deselectStartRange(){
 
         int position = selectRangeStartTime.getHour()+ (selectRangeStartTime.getMinute()>=30?1:0);

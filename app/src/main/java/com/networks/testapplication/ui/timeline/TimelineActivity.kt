@@ -35,8 +35,8 @@ class TimelineActivity : AppCompatActivity(), ItemScrollChangeListener{
 
         selectable_timeline_view.setSelectedColor(ContextCompat.getColor(this, R.color.colorAccent))
 
-        selectable_timeline_view.setMaximumSelectableRanges(4)
-        selectable_timeline_view.setUnselectableRanges(ranges,true)
+        selectable_timeline_view.setMaximumSelectableRanges(10)
+        selectable_timeline_view.setUnselectableRanges(ranges,false)
         selectable_timeline_view.setOnRangeSelectedListener(object : OnRangeStateChangeListener{
             override fun onRangeSelected(from: TimelineTime, to: TimelineTime) {
 
@@ -58,6 +58,18 @@ class TimelineActivity : AppCompatActivity(), ItemScrollChangeListener{
 //                    Toast.LENGTH_LONG).show()
             }
         })
+
+        select_range_button.setOnClickListener {
+            selectable_timeline_view.selectRange(TimelineRange(
+                TimelineTime(0,53),
+                TimelineTime(2,23)))
+        }
+
+        deselect_range_button.setOnClickListener {
+            selectable_timeline_view.deselectRange(TimelineRange(
+                TimelineTime(0,0),
+                TimelineTime(1,23)))
+        }
 
 
     }

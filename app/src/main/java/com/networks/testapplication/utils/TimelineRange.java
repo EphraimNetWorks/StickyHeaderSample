@@ -42,4 +42,12 @@ public class TimelineRange {
     public TimelineTime getEndTime() {
         return endTime;
     }
+
+    public void setStartTime(TimelineTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public void setEndTime(TimelineTime endTime) {
+        this.endTime = endTime;
+    }
 }
