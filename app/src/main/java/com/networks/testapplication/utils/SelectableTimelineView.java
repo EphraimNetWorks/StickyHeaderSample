@@ -217,7 +217,7 @@ public class SelectableTimelineView extends FrameLayout implements
     }
 
     private void selectSecondRange(SelectableTimelinePoint point){
-        if (point.getItem().getFirstLineColor() != unselectableColor && !point.isSecondRangeSelected()){
+        if (point.getItem().getSecondLineColor() != unselectableColor && !point.isSecondRangeSelected()){
             point.selectSecondRange();
         }
     }
@@ -280,7 +280,7 @@ public class SelectableTimelineView extends FrameLayout implements
     }
 
     private void deselectSecondRange(SelectableTimelinePoint point){
-        if (point.getItem().getFirstLineColor() != unselectableColor && point.isSecondRangeSelected()){
+        if (point.getItem().getSecondLineColor() != unselectableColor && point.isSecondRangeSelected()){
             point.deselectSecondRange();
         }
     }

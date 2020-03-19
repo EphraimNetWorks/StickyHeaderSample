@@ -58,7 +58,7 @@ class TimelineActivity : AppCompatActivity(), ItemScrollChangeListener{
         select_range_button.setOnClickListener {
             selectable_timeline_view.selectRange(TimelineRange(
                 TimelineTime(10,0),
-                TimelineTime(10,30)))
+                TimelineTime(11,30)))
         }
 
         deselect_range_button.setOnClickListener {
