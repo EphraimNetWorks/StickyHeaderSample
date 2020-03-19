@@ -43,9 +43,7 @@ class TimelineActivity : AppCompatActivity(), ItemScrollChangeListener{
                 Toast.makeText(this@TimelineActivity,
                     "Range ${selectable_timeline_view.selectedRangeStartTime.hour}:${selectable_timeline_view.selectedRangeStartTime.minute} to ${selectable_timeline_view.selectedRangeEndTime.hour}:${selectable_timeline_view.selectedRangeEndTime.minute} Selected",
                     Toast.LENGTH_LONG).show()
-//                Toast.makeText(this@TimelineActivity,
-//                    "Range ${from.hour}:${from.minute} to ${to.hour}:${to.minute} Selected",
-//                    Toast.LENGTH_LONG).show()
+
             }
 
             override fun onRangeDeselected(from: TimelineTime, to: TimelineTime) {
@@ -53,22 +51,20 @@ class TimelineActivity : AppCompatActivity(), ItemScrollChangeListener{
                 Toast.makeText(this@TimelineActivity,
                     "Range ${selectable_timeline_view.selectedRangeStartTime?.hour?:"null"}:${selectable_timeline_view.selectedRangeStartTime?.minute?:"null"} to ${selectable_timeline_view.selectedRangeEndTime?.hour?:"null"}:${selectable_timeline_view.selectedRangeEndTime?.minute?:"null"} Selected",
                     Toast.LENGTH_LONG).show()
-//                Toast.makeText(this@TimelineActivity,
-//                    "Range ${from.hour}:${from.minute} to ${to.hour}:${to.minute} Deselected",
-//                    Toast.LENGTH_LONG).show()
+
             }
         })
 
         select_range_button.setOnClickListener {
             selectable_timeline_view.selectRange(TimelineRange(
-                TimelineTime(0,53),
-                TimelineTime(2,23)))
+                TimelineTime(10,0),
+                TimelineTime(10,30)))
         }
 
         deselect_range_button.setOnClickListener {
             selectable_timeline_view.deselectRange(TimelineRange(
-                TimelineTime(0,0),
-                TimelineTime(1,23)))
+                TimelineTime(10,0),
+                TimelineTime(10,30)))
         }
 
 

@@ -184,7 +184,7 @@ public class SelectableTimelineView extends FrameLayout implements
         TimelineTime endTime =  rangeToSelect.getEndTime();
 
         int startPosition = startTime.getHour()+ (startTime.getMinute()<30?0:1);
-        int endPosition = endTime.getHour()+ (endTime.getMinute()<30?0:1);
+        int endPosition = endTime.getHour()+ (endTime.getMinute()>30?1:0);
 
         boolean startFromFirst = startTime.getMinute()>=30;
         boolean endAtFirst = endTime.getMinute()==0 || endTime.getMinute()>30;
@@ -228,12 +228,12 @@ public class SelectableTimelineView extends FrameLayout implements
         TimelineTime endTime =  rangeToSelect.getEndTime();
 
         int startPosition = startTime.getHour()+ (startTime.getMinute()<30?0:1);
-        int endPosition = endTime.getHour()+ (endTime.getMinute()<30?0:1);
+        int endPosition = endTime.getHour()+ (endTime.getMinute()>30?1:0);
 
         boolean startFromFirst = startTime.getMinute()>=30;
         boolean endAtFirst = endTime.getMinute()==0 || endTime.getMinute()>30;
 
-        if(selectRangeEndTime.isAfter(endTime)){
+        if(selectRangeEndTime!= null && selectRangeEndTime.isAfter(endTime)){
             deselectPoints(startPosition,endPosition,startFromFirst,endAtFirst);
         }else {
             inverseDeselectPoints(startPosition,endPosition,startFromFirst,endAtFirst);
