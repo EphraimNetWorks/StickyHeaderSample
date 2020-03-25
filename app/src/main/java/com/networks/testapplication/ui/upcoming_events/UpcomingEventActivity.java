@@ -1,11 +1,8 @@
 package com.networks.testapplication.ui.upcoming_events;
 
 import android.content.DialogInterface;
-import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Pair;
-import android.view.View;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -20,13 +17,16 @@ import com.networks.testapplication.data.UpcomingEvent;
 import com.networks.testapplication.ui.adapters_viewholders.DateHeaderDataImpl;
 import com.networks.testapplication.ui.adapters_viewholders.HeaderDataImpl;
 import com.networks.testapplication.ui.adapters_viewholders.UpcomingEventListAdapter;
-import com.networks.testapplication.utils.DateTimeUtils;
 import com.networks.testapplication.utils.NetworkState;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 
 import org.threeten.bp.LocalDate;
+import org.threeten.bp.LocalDateTime;
+import org.threeten.bp.LocalTime;
+import org.threeten.bp.ZoneId;
+import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.Month;
 import org.threeten.bp.format.DateTimeFormatter;
 import org.threeten.bp.format.TextStyle;
@@ -91,9 +91,9 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
 
         calendarView.setOnDateChangedListener(this);
 
-        updateCalendarViewDay(LocalDate.now());
+        updateCalendarViewDay(ZonedDateTime.now());
 
-        onDateSelected(calendarView, CalendarDay.from(LocalDate.now()),true);
+        onDateSelected(calendarView, CalendarDay.from(ZonedDateTime.now().toLocalDate()),true);
     }
 
     @Override
@@ -119,7 +119,7 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
     }
 
     private Month currentMonth;
-    private void checkAndUpdateReservationMonth(LocalDate date){
+    private void checkAndUpdateReservationMonth(ZonedDateTime date){
 
         if(currentMonth == null || !currentMonth.equals(date.getMonth())){
             monthNameTextView.setText(date.getMonth().getDisplayName(TextStyle.FULL, Locale.US).toUpperCase());
@@ -128,13 +128,13 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
     }
 
 
-    LocalDate currentDate = LocalDate.now();
-    private void updateCalendarViewDay(LocalDate date){
+    ZonedDateTime currentDate = ZonedDateTime.now();
+    private void updateCalendarViewDay(ZonedDateTime date){
 
         if( currentDate != date) {
             currentDate = date;
-            calendarView.setCurrentDate(date);
-            calendarView.setSelectedDate(date);
+            calendarView.setCurrentDate(date.toLocalDate());
+            calendarView.setSelectedDate(date.toLocalDate());
         }
     }
 
@@ -144,7 +144,7 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
             DateHeaderDataImpl headerData1 = new DateHeaderDataImpl(HeaderDataImpl.HEADER,
                     R.layout.item_sticky_header,dayEventReservations.getDayDate());
 
-            dates.add(CalendarDay.from(dayEventReservations.getDayDate()));
+            dates.add(CalendarDay.from(dayEventReservations.getDayDate().toLocalDate()));
             mUpcomingEventAdapter.addHeaderAndData(dayEventReservations.getUpcomingEvents(), headerData1);
         }
 
@@ -184,7 +184,10 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
         for(UpcomingEvent upcomingEvent: upcomingEventsResponse){
 
             // convert start date(with time) to local date
-            LocalDate date = LocalDate.parse(upcomingEvent.getStart(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+            ZonedDateTime date = ZonedDateTime
+                    .parse(upcomingEvent.getStart())// timezone for date being parsed
+                    .withZoneSameInstant(ZoneId.of("EST"));
+            // timezone for user's date you can use ZoneId.systemDefault() for user's system timezone
 
             //add new day to dayReservationsList if it doesn't exist
             DayEventReservations dayEventReservations = new DayEventReservations(date);
@@ -212,7 +215,7 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
     private ArrayList<UpcomingEvent> getSampleResponse(){
 
         ArrayList<String> sampleDates = new ArrayList<>();
-        sampleDates.add("2019-12-09T15:25:36.000Z");
+        sampleDates.add("2019-12-09T01:25:36.000Z");
         sampleDates.add("2019-12-12T15:25:36.000Z");
         sampleDates.add("2019-12-13T15:25:36.000Z");
         sampleDates.add("2020-01-15T15:25:36.000Z");
@@ -262,7 +265,7 @@ public class UpcomingEventActivity extends AppCompatActivity implements Upcoming
     }
 
     @Override
-    public void onNewHeaderAttached(LocalDate date) {
+    public void onNewHeaderAttached(ZonedDateTime date) {
 
         checkAndUpdateReservationMonth(date);
 

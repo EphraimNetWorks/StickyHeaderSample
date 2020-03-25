@@ -4,7 +4,7 @@ import androidx.annotation.LayoutRes;
 
 import com.saber.stickyheader.stickyData.HeaderData;
 
-import org.threeten.bp.LocalDate;
+import org.threeten.bp.ZonedDateTime;
 
 public class DateHeaderDataImpl implements HeaderData {
     public static final int HEADER = 10001;
@@ -13,9 +13,9 @@ public class DateHeaderDataImpl implements HeaderData {
     @LayoutRes
     private final int layoutResource;
 
-    private LocalDate headerDate;
+    private ZonedDateTime headerDate;
 
-    public DateHeaderDataImpl(int headerType, @LayoutRes int layoutResource, LocalDate headerTitle) {
+    public DateHeaderDataImpl(int headerType, @LayoutRes int layoutResource, ZonedDateTime headerTitle) {
         this.layoutResource = layoutResource;
         this.headerType = headerType;
         this.headerDate = headerTitle;
@@ -33,7 +33,7 @@ public class DateHeaderDataImpl implements HeaderData {
         return headerType;
     }
 
-    public LocalDate getHeaderDate() {
+    public ZonedDateTime getHeaderDate() {
         return headerDate;
     }
 }

@@ -2,17 +2,17 @@ package com.networks.testapplication.data;
 
 import androidx.annotation.Nullable;
 
-import org.threeten.bp.LocalDate;
+import org.threeten.bp.ZonedDateTime;
 
 import java.util.ArrayList;
 
 public class DayEventReservations {
 
-    private LocalDate dayDate;
+    private ZonedDateTime dayDate;
 
     private ArrayList<UpcomingEvent> upcomingEvents;
 
-    public DayEventReservations(LocalDate dayDate){
+    public DayEventReservations(ZonedDateTime dayDate){
         this.dayDate = dayDate;
     }
 
@@ -20,11 +20,11 @@ public class DayEventReservations {
         upcomingEvents.add(upcomingGuest);
     }
 
-    public LocalDate getDayDate() {
+    public ZonedDateTime getDayDate() {
         return dayDate;
     }
 
-    public void setDayDate(LocalDate dayDate) {
+    public void setDayDate(ZonedDateTime dayDate) {
         this.dayDate = dayDate;
     }
 

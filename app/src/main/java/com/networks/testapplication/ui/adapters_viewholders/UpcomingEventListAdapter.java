@@ -19,6 +19,7 @@ import com.networks.testapplication.utils.NetworkStateCallback;
 import com.networks.testapplication.utils.RefreshCallback;
 
 import org.threeten.bp.LocalDate;
+import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.format.DateTimeFormatter;
 
 import butterknife.BindView;
@@ -122,7 +123,7 @@ public class UpcomingEventListAdapter extends StickyHeaderAdapter<UpcomingEvent,
         void onItemClick(String eventId);
         public void showDialog(int title, int body, int positiveText, DialogInterface.OnClickListener positiveListener, int negativeText, DialogInterface.OnClickListener negativeListener, Object o);
         void refreshEventList();
-        void onNewHeaderAttached(LocalDate date);
+        void onNewHeaderAttached(ZonedDateTime date);
 
     }
 

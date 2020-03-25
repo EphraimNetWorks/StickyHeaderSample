@@ -21,7 +21,8 @@ import com.networks.testapplication.ui.adapters_viewholders.HeaderDataImpl;
 import com.networks.testapplication.ui.adapters_viewholders.UpcomingEventListAdapter;
 import com.networks.testapplication.utils.NetworkState;
 
-import org.threeten.bp.LocalDate;
+import org.threeten.bp.ZoneId;
+import org.threeten.bp.ZonedDateTime;
 import org.threeten.bp.Month;
 import org.threeten.bp.format.DateTimeFormatter;
 import org.threeten.bp.format.TextStyle;
@@ -65,7 +66,7 @@ public class StickyFragment extends Fragment implements UpcomingEventListAdapter
     }
 
     private Month currentMonth;
-    private void checkAndUpdateReservationMonth(LocalDate date){
+    private void checkAndUpdateReservationMonth(ZonedDateTime date){
 
         if(currentMonth == null || !currentMonth.equals(date.getMonth())){
             monthNameTextView.setText(date.getMonth().getDisplayName(TextStyle.FULL, Locale.US).toUpperCase());
@@ -111,7 +112,8 @@ public class StickyFragment extends Fragment implements UpcomingEventListAdapter
         for(UpcomingEvent upcomingEvent: upcomingEventsResponse){
 
             // convert start date(with time) to local date
-            LocalDate date = LocalDate.parse(upcomingEvent.getStart(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"));
+            ZonedDateTime date = ZonedDateTime.parse(upcomingEvent.getStart(), DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"))
+                    .withZoneSameInstant(ZoneId.systemDefault());
 
             //add new day to dayReservationsList if it doesn't exist
             DayEventReservations dayEventReservations = new DayEventReservations(date);
@@ -189,7 +191,7 @@ public class StickyFragment extends Fragment implements UpcomingEventListAdapter
     }
 
     @Override
-    public void onNewHeaderAttached(LocalDate date) {
+    public void onNewHeaderAttached(ZonedDateTime date) {
 
         checkAndUpdateReservationMonth(date);
     }

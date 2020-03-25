@@ -127,7 +127,7 @@ public abstract class StickyHeaderAdapter<D extends StickyMainData, H extends He
     }
 
     private void updateDatesMap(DateHeaderDataImpl dateHeader){
-        CalendarDay headerDay = CalendarDay.from(dateHeader.getHeaderDate());
+        CalendarDay headerDay = CalendarDay.from(dateHeader.getHeaderDate().toLocalDate());
         dateMaps.put(headerDay,mData.size());
     }
 
