@@ -2,13 +2,15 @@ package com.networks.testapplication.utils;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.Rect;
+import android.os.Build;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.View;
-import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
 
@@ -28,6 +30,7 @@ public class SelectableTimelineView extends FrameLayout implements
     private int defaultColor = Color.TRANSPARENT;
 
     private LinearLayout timelineLinearLayout;
+    private RelativeLayout timelineContainer;
     private ObservableHorizontalScrollView hsv;
 
     private int maximumSelectableRanges = 48;
@@ -62,6 +65,7 @@ public class SelectableTimelineView extends FrameLayout implements
         View view = View.inflate(context, R.layout.new_timeline_view, null);
         hsv = view.findViewById(R.id.timeline_hsv);
         timelineLinearLayout = view.findViewById(R.id.timeline_view_linear_layout);
+        timelineContainer = view.findViewById(R.id.timeline_container);
         addView(view);
     }
 
@@ -120,16 +124,40 @@ public class SelectableTimelineView extends FrameLayout implements
         }
 
 
-        if(scrollToCurrentTime) {
 
-            selectDefaultRange();
+        selectDefaultRange();
 
-            new Handler().postDelayed(() -> {
+        timelineContainer.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
 
-                LocalTime time = LocalTime.now();
-                scrollToTime(new TimelineTime(time.getHour(), time.getMinute()));
-            }, 100);
-        }
+                timelineContainer.getViewTreeObserver()
+                        .removeOnGlobalLayoutListener(this);
+
+                adjustCurrentTimeView();
+
+                startTimeUpdates();
+
+                if(scrollToCurrentTime) {
+                    LocalTime time = LocalTime.now();
+                    scrollToTime(new TimelineTime(time.getHour(), time.getMinute()));
+                }
+
+            }
+        });
+
+    }
+
+    boolean updateCurrentTimeIndicator = true;
+    private Handler updateHandler = new Handler();
+    private void startTimeUpdates(){
+        updateHandler.postDelayed(() -> {
+            if(updateCurrentTimeIndicator) {
+
+                adjustCurrentTimeView();
+                startTimeUpdates();
+            }
+        }, 60*1000);
     }
 
     private void selectDefaultRange(){
@@ -141,6 +169,7 @@ public class SelectableTimelineView extends FrameLayout implements
         int approximatedMinute = (time.getMinute()+(intervalIncrement-time.getMinute()%intervalIncrement))%60;
         time = LocalTime.of(approximatedHour,approximatedMinute );
 
+        int initialPosition = time.getHour()+ (time.getMinute()<30?0:1);
         int position = time.getHour()+ (time.getMinute()<30?0:1);
         boolean startFromFirst = time.getMinute()>=30;
         double unselectableRatio ;
@@ -155,18 +184,21 @@ public class SelectableTimelineView extends FrameLayout implements
         while (position<timelineLinearLayout.getChildCount())  {
             SelectableTimelinePoint point = (SelectableTimelinePoint) timelineLinearLayout.getChildAt(position);
 
-
             if(startFromFirst) {
                 if (point.getItem().getFirstLineColor() != unselectableColor){
-                    point.setFirstRangeSelectablePercentage(unselectableRatio);
-                    point.setCustomFirstStartTime(new TimelineTime(time.getHour(),time.getMinute()));
+                    if(position<initialPosition) {
+                        point.setFirstRangeSelectablePercentage(unselectableRatio);
+                        point.setCustomFirstStartTime(new TimelineTime(time.getHour(), time.getMinute()));
+                    }
                     point.selectFirstRange();
                     break;
                 }
             }
             if (point.getItem().getSecondLineColor() != unselectableColor && position<24){
-                point.setSecondSelectablePercentage(unselectableRatio);
-                point.setCustomSecondStartTime(new TimelineTime(time.getHour(),time.getMinute()));
+                if(position<initialPosition) {
+                    point.setSecondSelectablePercentage(unselectableRatio);
+                    point.setCustomSecondStartTime(new TimelineTime(time.getHour(), time.getMinute()));
+                }
                 point.selectSecondRange();
                 break;
             }
@@ -311,11 +343,9 @@ public class SelectableTimelineView extends FrameLayout implements
 
     }
 
-
     public void setOnRangeSelectedListener(OnRangeStateChangeListener listener){
         mlistener = listener;
     }
-
 
     public void setSelectedColor(int color){
 
@@ -455,6 +485,43 @@ public class SelectableTimelineView extends FrameLayout implements
         this.maximumSelectableRanges = maximumSelectableRanges;
     }
 
+    View currentTimeView;
+    public void adjustCurrentTimeView(){
+        LocalTime time = LocalTime.now();
+        TimelineTime currentTime = new TimelineTime(time.getHour(),time.getMinute());
+        float verticalLineWidth = ((SelectableTimelinePoint) timelineLinearLayout.getChildAt(0)).getVerticalLine().getWidth();
+        float rangeSize = ((SelectableTimelinePoint) timelineLinearLayout.getChildAt(0)).getFirstRangeView().getWidth();
+
+        if(currentTimeView == null){
+            currentTimeView = timelineContainer.findViewById(R.id.current_time_indicator);
+        }
+        float firstRangeStart = ((SelectableTimelinePoint) timelineLinearLayout.getChildAt(0))
+                .getVerticalLine().getX();
+
+        float hourMargin = (currentTime.getHour()*2*rangeSize)+ (currentTime.getHour()*verticalLineWidth);
+        float minute30 = currentTime.getMinute()<=30? currentTime.getMinute(): currentTime.getMinute()-30;
+        float minuteMargin = (minute30/30)* rangeSize;
+        if(currentTime.getMinute()>30) minuteMargin = minuteMargin+rangeSize;
+        int margin = (int) (hourMargin+minuteMargin);
+        currentTimeView.animate()
+                .x(margin+ (int)firstRangeStart)
+                .setDuration(0)
+                .start();
+
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        updateCurrentTimeIndicator = false;
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        updateCurrentTimeIndicator = true;
+    }
+
     public class Item{
         private int firstLineColor;
         private int secondLineColor;
@@ -487,31 +554,5 @@ public class SelectableTimelineView extends FrameLayout implements
         }
 
     }
-
-    public View findViewAt( int x, int y) {
-        return findViewAt(timelineLinearLayout, x, y);
-    }
-
-    public View findViewAt(ViewGroup viewGroup, int x, int y) {
-        for(int i = 0; i < viewGroup.getChildCount(); i++) {
-            View child = viewGroup.getChildAt(i);
-            if (child instanceof ViewGroup) {
-                View foundView = findViewAt((ViewGroup) child, x, y);
-                if (foundView != null && foundView.isShown()) {
-                    return foundView;
-                }
-            } else {
-                int[] location = new int[2];
-                child.getLocationOnScreen(location);
-                Rect rect = new Rect(location[0], location[1], location[0] + child.getWidth(), location[1] + child.getHeight());
-                if (rect.contains(x, y)) {
-                    return child;
-                }
-            }
-        }
-
-        return null;
-    }
-
 
 }

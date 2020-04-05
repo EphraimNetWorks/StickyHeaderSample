@@ -294,6 +294,19 @@ public class SelectableTimelinePoint extends FrameLayout {
         }
     }
 
+    public View getVerticalLine() {
+        return verticalLine;
+    }
+
+    public RangeView getFirstRangeView() {
+        return firstRangeView;
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh) {
+        super.onSizeChanged(w, h, oldw, oldh);
+    }
+
     public interface OnPointRangeStateChangeListener{
         void onRangeSelected(SelectableTimelinePoint point, TimelineTime from, TimelineTime to);
         void onRangeDeselected(SelectableTimelinePoint point, TimelineTime from, TimelineTime to);

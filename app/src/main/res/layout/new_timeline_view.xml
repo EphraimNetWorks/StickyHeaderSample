@@ -8,10 +8,23 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content">
 
-    <LinearLayout
-        android:id="@+id/timeline_view_linear_layout"
+    <RelativeLayout
+        android:id="@+id/timeline_container"
         android:layout_width="match_parent"
-        android:orientation="horizontal"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:id="@+id/timeline_view_linear_layout"
+            android:layout_width="match_parent"
+            android:orientation="horizontal"
+            android:layout_height="wrap_content"/>
+
+        <ImageView
+            android:id="@+id/current_time_indicator"
+            android:layout_width="2dp"
+            android:layout_height="60dp"
+            android:layout_marginTop="20dp"
+            android:layout_alignParentTop="true"
+            android:background="@android:color/holo_red_light"/>
+    </RelativeLayout>
 
 </com.networks.testapplication.utils.ObservableHorizontalScrollView>
