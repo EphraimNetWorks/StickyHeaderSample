@@ -45,7 +45,7 @@
 
         <View
             android:id="@+id/second_line"
-            android:layout_width="40dp"
+            android:layout_width="38dp"
             android:layout_height="5dp"
             android:background="#BDBDBD"
             app:layout_constraintBottom_toBottomOf="@id/vertical_line"
@@ -88,7 +88,7 @@
             android:layout_height="40dp"
             app:layout_goneMarginStart="20dp"
             app:layout_goneMarginEnd="20dp"
-            app:layout_constraintStart_toEndOf="@id/vertical_line"
+            app:layout_constraintStart_toStartOf="@id/vertical_line"
             app:layout_constraintTop_toBottomOf="@id/second_line"
             app:layout_constraintEnd_toEndOf="parent"/>
         

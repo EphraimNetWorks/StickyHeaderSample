@@ -18,6 +18,48 @@
             android:orientation="horizontal"
             android:layout_height="wrap_content"/>
 
+        <View
+            android:id="@+id/selector_start_point"
+            android:layout_width="30dp"
+            android:layout_height="40dp"
+            android:layout_alignBottom="@id/timeline_view_linear_layout"
+            android:background="@color/colorAccent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+
+        <View
+            android:id="@+id/selector_mid"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:background="@color/colorAccent"
+            android:layout_alignBottom="@id/timeline_view_linear_layout"
+            android:visibility="visible"
+            android:layout_toEndOf="@id/selector_start_point"/>
+
+
+        <FrameLayout
+            android:id="@+id/selector_end_point"
+            android:layout_width="wrap_content"
+            android:layout_height="40dp"
+            android:layout_alignBottom="@id/timeline_view_linear_layout"
+            android:layout_toEndOf="@id/selector_start_point">
+
+            <View
+                android:id="@+id/selector_end_background"
+                android:layout_width="10dp"
+                android:layout_height="match_parent"
+                android:background="@color/colorAccent"
+                android:layout_gravity="start"/>
+
+            <ImageView
+                android:id="@+id/selector_end_circle"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/selector_round"
+                android:layout_gravity="center_vertical"/>
+
+        </FrameLayout>
+
         <ImageView
             android:id="@+id/current_time_indicator"
             android:layout_width="2dp"

@@ -1,6 +1,6 @@
 package com.networks.testapplication.ui.timeline
 
-import android.graphics.Color
+
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Pair
@@ -9,7 +9,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import com.jakewharton.threetenabp.AndroidThreeTen
 import com.networks.testapplication.R
 import com.networks.testapplication.utils.OnRangeStateChangeListener
@@ -33,38 +32,22 @@ class TimelineActivity : AppCompatActivity(), ItemScrollChangeListener{
                     TimelineRange(TimelineTime(11,0), TimelineTime(14,0))
         )
 
-        selectable_timeline_view.setSelectedColor(ContextCompat.getColor(this, R.color.colorAccent))
+        selectable_timeline_view.selectedColor = (ContextCompat.getColor(this, R.color.colorAccent))
 
-        selectable_timeline_view.setMaximumSelectableRanges(10)
-        selectable_timeline_view.setUnselectableRanges(ranges,false)
+        selectable_timeline_view.setUnselectableRanges(ranges,true)
         selectable_timeline_view.setOnRangeSelectedListener(object : OnRangeStateChangeListener{
-            override fun onRangeSelected(from: TimelineTime, to: TimelineTime) {
+            override fun onSelectedRangeChanged(newFrom: TimelineTime, newTo: TimelineTime){
 
                 Toast.makeText(this@TimelineActivity,
-                    "Range ${selectable_timeline_view.selectedRangeStartTime.hour}:${selectable_timeline_view.selectedRangeStartTime.minute} to ${selectable_timeline_view.selectedRangeEndTime.hour}:${selectable_timeline_view.selectedRangeEndTime.minute} Selected",
-                    Toast.LENGTH_LONG).show()
-
-            }
-
-            override fun onRangeDeselected(from: TimelineTime, to: TimelineTime) {
-
-                Toast.makeText(this@TimelineActivity,
-                    "Range ${selectable_timeline_view.selectedRangeStartTime?.hour?:"null"}:${selectable_timeline_view.selectedRangeStartTime?.minute?:"null"} to ${selectable_timeline_view.selectedRangeEndTime?.hour?:"null"}:${selectable_timeline_view.selectedRangeEndTime?.minute?:"null"} Selected",
+                    "Range ${newFrom.hour}:${newFrom.minute} to ${newTo.hour}:${newTo.minute} Selected",
                     Toast.LENGTH_LONG).show()
 
             }
         })
 
         select_range_button.setOnClickListener {
-            selectable_timeline_view.selectRange(TimelineRange(
-                TimelineTime(10,0),
-                TimelineTime(11,30)))
-        }
-
-        deselect_range_button.setOnClickListener {
-            selectable_timeline_view.deselectRange(TimelineRange(
-                TimelineTime(10,0),
-                TimelineTime(10,30)))
+            selectable_timeline_view.selectRange(TimelineRange(TimelineTime(5,30),
+                TimelineTime(6,0)))
         }
 
 
