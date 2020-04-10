@@ -13,7 +13,6 @@ import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.updateLayoutParams
-import com.networks.testapplication.R
 import kotlinx.android.synthetic.main.new_timeline_view.view.*
 import kotlin.math.roundToInt
 
@@ -87,33 +86,59 @@ class TimelineSelectorHelper(timelineContainer:RelativeLayout,
     private fun setSelectorStartPoint(newStartPosition: Float){
 
 
+        val firstRangeStart = getStartRangeViewX()
+
+        val startPosition = if(newStartPosition<firstRangeStart){
+            firstRangeStart
+        }else{
+            newStartPosition
+        }
+
         selectorStartPoint.animate()
-            .x(newStartPosition)
+            .x(startPosition)
             .setInterpolator(AccelerateDecelerateInterpolator())
             .setDuration(0)
             .start()
 
+        var endPosition = startPosition + selectorStartPoint.measuredWidth + selectorMid.measuredWidth
+
+        val lastRangeEnd = getEndRangeViewX()
+        if(endPosition>lastRangeEnd) {
+            endPosition = lastRangeEnd - selectorEndPoint.selector_end_background.width
+            val newMidWidth = (endPosition-(startPosition+selectorStartPoint.width)).roundToInt()
+            selectorMid.updateLayoutParams<RelativeLayout.LayoutParams> {
+                width = newMidWidth
+            }
+        }
 
         selectorMid.animate()
-            .x(newStartPosition + selectorStartPoint.measuredWidth)
+            .x(startPosition + selectorStartPoint.measuredWidth)
             .setDuration(0)
             .start()
 
-        val endPosition = newStartPosition + selectorStartPoint.measuredWidth + selectorMid.measuredWidth
 
         selectorEndPoint.animate()
             .x(endPosition)
             .setDuration(0)
             .start()
+
     }
 
     private fun setSelectorEndPoint(newEndPosition: Float){
 
         val selectorStartRight = selectorStartPoint.x + selectorStartPoint.width
+        val lastRangeEnd = getEndRangeViewX()
 
         //replace new position if overlaps with start position
-        val endPosition = if(newEndPosition>selectorStartRight) newEndPosition
-        else selectorStartRight+selectorEndPoint.selector_end_background.width-1
+        val endPosition = when {
+            newEndPosition>lastRangeEnd -> {
+                lastRangeEnd
+            }
+            newEndPosition>selectorStartRight -> {
+                newEndPosition
+            }
+            else -> selectorStartRight+selectorEndPoint.selector_end_background.width-1
+        }
 
         val adjustedEndPosition = endPosition-(selectorEndPoint.selector_end_circle.width
                 - selectorEndPoint.selector_end_background.width)
@@ -149,15 +174,34 @@ class TimelineSelectorHelper(timelineContainer:RelativeLayout,
         selectedStartTime = startPointRangePair.second.timeRange.startTime
 
         val selectorEndBg = selectorEndPoint.selector_end_background
-        val endX = selectorEndPoint.x + selectorEndBg.width
+        var endX = selectorEndPoint.x + selectorEndBg.width
+        val endRangeViewX = getEndRangeViewX()
+        if (endX> endRangeViewX) {
+            endX = endRangeViewX
+        }
         val endPointRangePair = timelineLinearLayout.getPointAndRange(endX,snapY)!!
 
         //set new end time after snap
         selectedEndTime = endPointRangePair.second.timeRange.startTime
 
         //send updates on new selected time changes
-        rangeChangedListener.invoke()?.onSelectedRangeChanged(selectedStartTime!!,selectedEndTime!!)
+        if(selectedEndTime!=selectedStartTime) {
+            rangeChangedListener.invoke()
+                ?.onSelectedRangeChanged(selectedStartTime!!, selectedEndTime!!)
+        }
 
+    }
+
+    private fun getStartRangeViewX():Float{
+        val firstRangeStart =
+            (timelineLinearLayout.getChildAt(0) as SelectableTimelinePoint)
+                .verticalLine.x
+        return firstRangeStart
+    }
+
+    private fun getEndRangeViewX():Float{
+        val lastSTP = timelineLinearLayout.getChildAt(timelineLinearLayout.childCount-1)as SelectableTimelinePoint
+        return lastSTP.x + lastSTP.firstRangeView.width
     }
 
     private fun snapSelectorEnd(){
@@ -199,21 +243,6 @@ class TimelineSelectorHelper(timelineContainer:RelativeLayout,
                         setSelectorEndPoint(event.x)
                     }else {
                         setSelectorStartPoint(event.x)
-                    }
-
-                    //auto scroll while dragging
-                    val x = event.x.roundToInt()
-                    val translatedX: Int = x - scrollview.scrollX
-                    val threshold = 30
-
-                    // make a scrolling up due the x has passed the threshold
-                    if (translatedX < threshold) { // make a scroll left by 30 px
-                        scrollview.scrollBy(-30, 0)
-                    }
-
-                    // make a autoscrolling down due y has passed the 500 px border
-                    if (translatedX + threshold > 500) { // make a scroll down by 30 px
-                        scrollview.scrollBy(30, 0)
                     }
                 }
                 DragEvent.ACTION_DRAG_ENDED->{

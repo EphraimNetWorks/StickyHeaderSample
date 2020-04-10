@@ -17,7 +17,7 @@ class SelectableTimelinePoint : FrameLayout {
     lateinit var firstRangeView: RangeView
         private set
     private lateinit var secondLine: View
-    private lateinit var secondRangeView: RangeView
+    lateinit var secondRangeView: RangeView
     lateinit var verticalLine: View
         private set
     private lateinit var verticalLineExtension: View
@@ -123,6 +123,9 @@ class SelectableTimelinePoint : FrameLayout {
                     30
                 ), TimelineTime(item!!.position, 0)
             )
+        }else{
+            firstRangeView.timeRange = TimelineRange(
+                TimelineTime(0, 0), TimelineTime(0, 0))
         }
 
         if(item!!.position<24) {
@@ -132,6 +135,9 @@ class SelectableTimelinePoint : FrameLayout {
                     0
                 ), TimelineTime(item!!.position, 30)
             )
+        }else{
+            secondRangeView.timeRange = TimelineRange(
+                TimelineTime(item!!.position, 0), TimelineTime(item!!.position, 0))
         }
 
     }
