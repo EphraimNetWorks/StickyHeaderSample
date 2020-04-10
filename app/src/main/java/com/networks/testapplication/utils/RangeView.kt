@@ -17,6 +17,8 @@ class RangeView : FrameLayout {
     private var mDefaultColor = Color.TRANSPARENT
     private var mUnselectedColor = Color.GRAY
 
+    lateinit var selectableTimelinePoint :SelectableTimelinePoint
+
     lateinit var timeRange :TimelineRange
 
     constructor(context: Context) : super(context) {

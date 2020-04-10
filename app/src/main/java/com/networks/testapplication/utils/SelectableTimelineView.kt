@@ -19,7 +19,7 @@ class SelectableTimelineView @JvmOverloads constructor(context: Context,
                                                        attrs: AttributeSet? = null,
                                                        defStyleAttr: Int = 0,
                                                        defStyleRes: Int = 0):
-    FrameLayout(context, attrs, defStyleAttr,defStyleRes){
+    FrameLayout(context, attrs, defStyleAttr,defStyleRes), SelectableTimelinePoint.OnRangeClickListener{
 
     var selectedColor = Color.GREEN
         set(value) {
@@ -116,6 +116,7 @@ class SelectableTimelineView @JvmOverloads constructor(context: Context,
                 }
             }
             val timelinePoint = SelectableTimelinePoint(context)
+            timelinePoint.onRangeClickListener = this
             timelinePoint.setSelectableColor(selectedColor)
             timelinePoint.setUnselectableColor(unselectableColor)
             timelinePoint.setItem(item, 25)
@@ -172,6 +173,10 @@ class SelectableTimelineView @JvmOverloads constructor(context: Context,
 
     fun setOnRangeSelectedListener(listener: OnRangeStateChangeListener){
         mlistener = listener
+    }
+
+    override fun onRangeClick(rangeView: RangeView) {
+        selectorHelper.moveToRangeViewPosition(rangeView)
     }
 
     private fun selectDefaultRange() {

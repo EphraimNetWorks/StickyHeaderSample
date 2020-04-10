@@ -24,8 +24,8 @@ class SelectableTimelinePoint : FrameLayout {
     private lateinit var textview: TextView
     private var selectedColor = Color.GREEN
     private var unselectableColor = Color.LTGRAY
-    var item: Item?= null
-        private set
+    private var item: Item?= null
+    lateinit var onRangeClickListener:OnRangeClickListener
 
     constructor(context: Context) : super(context) {
         initView(context)
@@ -99,6 +99,19 @@ class SelectableTimelinePoint : FrameLayout {
         }
 
         setRangeViewTime()
+        setUpClickListeners()
+    }
+
+    private fun setUpClickListeners(){
+        firstRangeView.selectableTimelinePoint = this
+        secondRangeView.selectableTimelinePoint = this
+
+        firstRangeView.setOnClickListener {
+            onRangeClickListener.onRangeClick(it as RangeView)
+        }
+        secondRangeView.setOnClickListener {
+            onRangeClickListener.onRangeClick(it as RangeView)
+        }
     }
 
     private fun setRangeViewTime() {
@@ -151,6 +164,10 @@ class SelectableTimelinePoint : FrameLayout {
 
     fun setSelectableColor(color: Int) {
         selectedColor = color
+    }
+
+    interface OnRangeClickListener{
+        fun onRangeClick(rangeView: RangeView)
     }
 
     class Item(var firstLineColor: Int, var secondLineColor: Int, val position: Int)

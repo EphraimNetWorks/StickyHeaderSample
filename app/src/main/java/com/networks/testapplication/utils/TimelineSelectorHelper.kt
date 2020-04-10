@@ -77,6 +77,12 @@ class TimelineSelectorHelper(timelineContainer:RelativeLayout,
         return margin+firstRangeStart
     }
 
+    fun moveToRangeViewPosition(rangeView: RangeView){
+        val startX = rangeView.selectableTimelinePoint.x+rangeView.x
+        setSelectorStartPoint(startX)
+        snapSelectorStart()
+    }
+
 
     private fun setSelectorStartPoint(newStartPosition: Float){
 
