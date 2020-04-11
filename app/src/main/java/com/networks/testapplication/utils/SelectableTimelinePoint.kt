@@ -98,8 +98,8 @@ class SelectableTimelinePoint : FrameLayout {
             else -> textview.text = "" + item.position % 12 + timeSuffix
         }
 
-        setRangeViewTime()
         setUpClickListeners()
+        setRangeViewTime()
     }
 
     private fun setUpClickListeners(){
@@ -126,6 +126,7 @@ class SelectableTimelinePoint : FrameLayout {
         }else{
             firstRangeView.timeRange = TimelineRange(
                 TimelineTime(0, 0), TimelineTime(0, 0))
+            firstRangeView.setOnClickListener(null)
         }
 
         if(item!!.position<24) {
@@ -138,6 +139,7 @@ class SelectableTimelinePoint : FrameLayout {
         }else{
             secondRangeView.timeRange = TimelineRange(
                 TimelineTime(item!!.position, 0), TimelineTime(item!!.position, 0))
+            secondRangeView.setOnClickListener(null)
         }
 
     }
