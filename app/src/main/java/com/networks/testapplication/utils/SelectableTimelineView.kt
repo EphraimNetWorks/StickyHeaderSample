@@ -203,9 +203,6 @@ class SelectableTimelineView @JvmOverloads constructor(context: Context,
     fun adjustCurrentTimeView() {
         val time = LocalTime.now()
         val currentTime = TimelineTime(time.hour, time.minute)
-        val verticalLineWidth =
-            (timelineLinearLayout.getChildAt(0) as SelectableTimelinePoint).verticalLine.width
-                .toFloat()
         val rangeSize =
             (timelineLinearLayout.getChildAt(0) as SelectableTimelinePoint).firstRangeView.width
                 .toFloat()
@@ -217,7 +214,7 @@ class SelectableTimelineView @JvmOverloads constructor(context: Context,
             (timelineLinearLayout.getChildAt(0) as SelectableTimelinePoint)
                 .verticalLine.x
         val hourMargin =
-            currentTime.hour * 2 * rangeSize + currentTime.hour * verticalLineWidth
+            currentTime.hour * 2 * rangeSize
         val minute30 =
             if (currentTime.minute <= 30) currentTime.minute.toFloat() else currentTime.minute - 30.toFloat()
         var minuteMargin = minute30 / 30 * rangeSize
