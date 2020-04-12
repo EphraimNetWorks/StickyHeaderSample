@@ -39,9 +39,15 @@ class TimelineSelectorHelper(timelineContainer:RelativeLayout,
     }
 
     fun selectRange(range:TimelineRange){
-        setSelectorStartPoint(getRangeViewX(range.startTime))
+        val startX = getRangeViewX(range.startTime)
+        setSelectorStartPoint(startX)
 
-        val endX = getRangeViewX(range.endTime)-(selectorEndPoint.selector_end_background.width/2)
+        val numberOfRanges = ((range.endTime.hour - range.startTime.hour)*60 + (range.endTime.minute - range.startTime.minute))/30
+        val rangeSize =
+            (timelineLinearLayout.getChildAt(0) as SelectableTimelinePoint).firstRangeView.width
+                .toFloat()
+
+        val endX = startX+numberOfRanges*rangeSize
         setSelectorEndPoint(endX)
 
         snapSelectorStart()
@@ -99,6 +105,7 @@ class TimelineSelectorHelper(timelineContainer:RelativeLayout,
             .setDuration(0)
             .start()
 
+
         var endPosition = startPosition + selectorStartPoint.measuredWidth + selectorMid.measuredWidth
 
         if(endPosition>lastRangeEnd) {
@@ -144,14 +151,14 @@ class TimelineSelectorHelper(timelineContainer:RelativeLayout,
         val adjustedEndPosition = endPosition-(selectorEndPoint.selector_end_circle.width
                 - selectorEndPoint.selector_end_background.width)
 
-        val selectorMidRight = selectorMid.x + selectorMid.measuredWidth
+        val selectorMidRight = selectorMid.x + selectorMid.width
         val widthDifference = adjustedEndPosition - selectorMidRight
 
         // update selector mid to fill space between start and end
         selectorMid.updateLayoutParams<RelativeLayout.LayoutParams> {
             width = selectorMid.width + widthDifference.toInt()
         }
-        selectorMid.measure(0,0)
+        selectorMid.measure(View.MeasureSpec.makeMeasureSpec(selectorMid.width + widthDifference.toInt(),View.MeasureSpec.EXACTLY),0)
 
         //adjust selector end view to new position
         selectorEndPoint.animate()
@@ -312,6 +319,9 @@ class TimelineSelectorHelper(timelineContainer:RelativeLayout,
                         view.startDrag(data,shadowBuilder, viewLabel,0)
                     }
                 }
+                MotionEvent.ACTION_UP ->{
+                    view.performClick()
+                }
 
                 else -> return true
             }
@@ -342,7 +352,17 @@ class TimelineSelectorHelper(timelineContainer:RelativeLayout,
         for(index in container.childCount-1 downTo 0){
             val child = container.getChildAt(index)
             val bounds = child.getChildXYBounds(this.x,this.y)
-            if (bounds.contains(x.roundToInt(), y.roundToInt()) ) {
+            if (bounds.contains(x.roundToInt(), y.roundToInt())  || x.toInt() == bounds.right ) {
+                if(child is RangeView) {
+                    return child
+                }
+            }
+        }
+
+        for(index in container.childCount-1 downTo 0){
+            val child = container.getChildAt(index)
+            val bounds = child.getChildXYBounds(this.x,this.y)
+            if (bounds.contains(x.roundToInt(), y.roundToInt()) || x.toInt() == bounds.right ) {
                 if(child is RangeView) {
                     return child
                 }
