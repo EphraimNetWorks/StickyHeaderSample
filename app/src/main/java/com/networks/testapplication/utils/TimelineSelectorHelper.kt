@@ -46,11 +46,6 @@ class TimelineSelectorHelper(timelineContainer:RelativeLayout,
 
         snapSelectorStart()
 
-        selectedStartTime = range.startTime
-        selectedEndTime = range.endTime
-
-        rangeChangedListener.invoke()?.onSelectedRangeChanged(selectedStartTime!!, selectedEndTime!!)
-
     }
 
     private fun getRangeViewX(time:TimelineTime):Float{
@@ -98,7 +93,6 @@ class TimelineSelectorHelper(timelineContainer:RelativeLayout,
             else -> newStartPosition // new position
         }
 
-
         selectorStartPoint.animate()
             .x(startPosition)
             .setInterpolator(AccelerateDecelerateInterpolator())
@@ -118,10 +112,9 @@ class TimelineSelectorHelper(timelineContainer:RelativeLayout,
         }
 
         selectorMid.animate()
-            .x(startPosition + selectorStartPoint.measuredWidth)
+            .x(startPosition + selectorStartPoint.width)
             .setDuration(0)
             .start()
-
 
         selectorEndPoint.animate()
             .x(endPosition)
@@ -151,6 +144,15 @@ class TimelineSelectorHelper(timelineContainer:RelativeLayout,
         val adjustedEndPosition = endPosition-(selectorEndPoint.selector_end_circle.width
                 - selectorEndPoint.selector_end_background.width)
 
+        val selectorMidRight = selectorMid.x + selectorMid.measuredWidth
+        val widthDifference = adjustedEndPosition - selectorMidRight
+
+        // update selector mid to fill space between start and end
+        selectorMid.updateLayoutParams<RelativeLayout.LayoutParams> {
+            width = selectorMid.width + widthDifference.toInt()
+        }
+        selectorMid.measure(0,0)
+
         //adjust selector end view to new position
         selectorEndPoint.animate()
             .x(adjustedEndPosition)
@@ -158,31 +160,36 @@ class TimelineSelectorHelper(timelineContainer:RelativeLayout,
             .setDuration(0)
             .start()
 
-        val selectorMidRight = selectorMid.x + selectorMid.measuredWidth
-        val widthDifference = selectorEndPoint.x - selectorMidRight
-
-        // update selector mid to fill space between start and end
-        selectorMid.updateLayoutParams<RelativeLayout.LayoutParams> {
-            width = selectorMid.width + widthDifference.toInt()
-        }
-
 
     }
 
     private fun snapSelectorStart(){
         //calculate and snap selector's start to start of rangeview
         val snapY = timelineLinearLayout.y+timelineLinearLayout.measuredHeight-1
-        val startPointRangePair = timelineLinearLayout.getPointAndRange(selectorStartPoint.x,snapY)!!
+        var startX = selectorStartPoint.x
 
-        val startRangeBounds = startPointRangePair.second.getChildXYBounds(startPointRangePair.first.x,
+        var startPointRangePair = timelineLinearLayout.getPointAndRange(startX,snapY)!!
+        var startRangeBounds = startPointRangePair.second.getChildXYBounds(startPointRangePair.first.x,
             startPointRangePair.first.y)
+
+        //select next range if start x covers more than two thirds of range
+        if((startRangeBounds.right - startX )<(startPointRangePair.second.width/3)){
+
+            startX = (startRangeBounds.right+1).toFloat()
+            startPointRangePair = timelineLinearLayout.getPointAndRange(startX,snapY)!!
+
+            startRangeBounds = startPointRangePair.second.getChildXYBounds(startPointRangePair.first.x,
+                startPointRangePair.first.y)
+
+        }
+
         setSelectorStartPoint(startRangeBounds.left.toFloat())
 
         //set new start time after snap
         selectedStartTime = startPointRangePair.second.timeRange.startTime
 
         // calculate number of selected ranges
-        val selectorWidth = selectorStartPoint.width+selectorMid.width+selectorEndPoint.selector_end_background.width+1
+        val selectorWidth = selectorStartPoint.width+selectorMid.measuredWidth+selectorEndPoint.selector_end_background.width+1
         val rangeViewWidth = startRangeBounds.right - startRangeBounds.left
         val numberOfSelectedRanges = selectorWidth/rangeViewWidth
 
@@ -191,7 +198,7 @@ class TimelineSelectorHelper(timelineContainer:RelativeLayout,
             .plusMinutes((numberOfSelectedRanges*30).toLong())
 
         //update selected end time
-        selectedEndTime = if(selectedStartTime!!.hour==23 && endTime.hour==0){
+        selectedEndTime = if(selectedStartTime!!.hour > endTime.hour){
             TimelineTime(24,0)
         }else{
             TimelineTime(endTime.hour, endTime.minute)
