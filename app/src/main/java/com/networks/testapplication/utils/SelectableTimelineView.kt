@@ -13,6 +13,7 @@ import androidx.core.graphics.ColorUtils
 import com.networks.testapplication.R
 import kotlinx.android.synthetic.main.new_timeline_view.view.*
 import org.threeten.bp.LocalTime
+import java.sql.Time
 import java.util.*
 
 class SelectableTimelineView @JvmOverloads constructor(context: Context,
@@ -88,6 +89,7 @@ class SelectableTimelineView @JvmOverloads constructor(context: Context,
 
     fun setUnselectableRanges( selectedRanges: List<TimelineRange>,scrollToCurrentTime:Boolean) {
 
+
         timelineLinearLayout.removeAllViews()
         for (hour in 0..24) {
             val item =
@@ -115,14 +117,15 @@ class SelectableTimelineView @JvmOverloads constructor(context: Context,
                     break
                 }
             }
+
             val timelinePoint = SelectableTimelinePoint(context)
             timelinePoint.onRangeClickListener = this
             timelinePoint.setSelectableColor(selectedColor)
             timelinePoint.setUnselectableColor(unselectableColor)
             timelinePoint.setItem(item, 25)
             timelineLinearLayout.addView(timelinePoint)
-        }
 
+        }
 
         timelineContainer.viewTreeObserver.addOnGlobalLayoutListener(object: ViewTreeObserver.OnGlobalLayoutListener{
             override fun onGlobalLayout() {
@@ -133,7 +136,7 @@ class SelectableTimelineView @JvmOverloads constructor(context: Context,
 
                 startTimeUpdates()
 
-                selectDefaultRange()
+                selectDefaultRange(selectedRanges)
 
                 if(scrollToCurrentTime) {
                     val time = LocalTime.now()
@@ -179,13 +182,38 @@ class SelectableTimelineView @JvmOverloads constructor(context: Context,
         selectorHelper.moveToRangeViewPosition(rangeView)
     }
 
-    private fun selectDefaultRange() {
+    private fun selectDefaultRange(unselectableRanges:List<TimelineRange>) {
+        val startPoint = getApproximatedTime(30, LocalTime.now().toTimelineTime()).toLocalTime()
 
-        val time = LocalTime.now()
-        val endTime = time.plusMinutes(30)
+        var defaultTime = startPoint
+        var hasSetDefaultTime = false
 
-        selectRange(TimelineRange(TimelineTime(time.hour, time.minute),
-            TimelineTime(endTime.hour, endTime.minute)))
+        do {
+            var isSelectable = true
+            for (range in unselectableRanges) {
+                val time = defaultTime.toTimelineTime()
+
+                if((range.startTime.isBefore(time)&& range.endTime.isAfter(time)) ||
+                        range.startTime == time){
+                    defaultTime = defaultTime.plusMinutes(30)
+                    isSelectable = false
+                    break
+                }
+            }
+            if (isSelectable) hasSetDefaultTime = true
+            if(startPoint == defaultTime) break
+        } while(!hasSetDefaultTime)
+
+        if(!hasSetDefaultTime){
+            defaultTime = LocalTime.of(8,0)
+        }
+
+        var endTime = defaultTime.plusMinutes(30).toTimelineTime()
+
+        if(defaultTime.hour>endTime.hour) endTime = TimelineTime(24,0)
+
+        selectRange(TimelineRange(defaultTime.toTimelineTime(),endTime))
+
     }
 
     var updateCurrentTimeIndicator = true
@@ -253,5 +281,13 @@ class SelectableTimelineView @JvmOverloads constructor(context: Context,
         fun onScrollChange(scrollX: Int)
     }
 
+    fun TimelineTime.toLocalTime():LocalTime{
+        val localTimeHour = if(hour==24) 0 else hour
+        return LocalTime.of(localTimeHour,minute)
+    }
+
+    fun LocalTime.toTimelineTime():TimelineTime{
+        return TimelineTime(hour,minute)
+    }
 
 }
