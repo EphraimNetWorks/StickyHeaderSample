@@ -29,7 +29,7 @@ class TimelineActivity : AppCompatActivity(), ItemScrollChangeListener{
 
         val ranges = arrayListOf(
             TimelineRange(TimelineTime(3,30), TimelineTime(4,30)),
-                    TimelineRange(TimelineTime(11,0), TimelineTime(14,0))
+                    TimelineRange(TimelineTime(7,30), TimelineTime(17,0))
         )
 
         selectable_timeline_view.selectedColor = (ContextCompat.getColor(this, R.color.colorAccent))

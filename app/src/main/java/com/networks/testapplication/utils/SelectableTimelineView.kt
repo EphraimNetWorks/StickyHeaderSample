@@ -183,36 +183,40 @@ class SelectableTimelineView @JvmOverloads constructor(context: Context,
     }
 
     private fun selectDefaultRange(unselectableRanges:List<TimelineRange>) {
+
         val startPoint = getApproximatedTime(30, LocalTime.now().toTimelineTime()).toLocalTime()
 
-        var defaultTime = startPoint
-        var hasSetDefaultTime = false
-
-        do {
-            var isSelectable = true
-            for (range in unselectableRanges) {
-                val time = defaultTime.toTimelineTime()
-
-                if((range.startTime.isBefore(time)&& range.endTime.isAfter(time)) ||
-                        range.startTime == time){
-                    defaultTime = defaultTime.plusMinutes(30)
-                    isSelectable = false
-                    break
-                }
-            }
-            if (isSelectable) hasSetDefaultTime = true
-            if(startPoint == defaultTime) break
-        } while(!hasSetDefaultTime)
-
-        if(!hasSetDefaultTime){
-            defaultTime = LocalTime.of(8,0)
-        }
+        var defaultTime = getEarliestAvailableRange(startPoint, unselectableRanges)
 
         var endTime = defaultTime.plusMinutes(30).toTimelineTime()
 
         if(defaultTime.hour>endTime.hour) endTime = TimelineTime(24,0)
 
         selectRange(TimelineRange(defaultTime.toTimelineTime(),endTime))
+
+    }
+
+    private fun getEarliestAvailableRange(startPoint: LocalTime, unselectableRanges: List<TimelineRange>): LocalTime{
+
+        var earliestAvailableTime = startPoint
+
+        do {
+            var isSelectable = true
+            for (range in unselectableRanges) {
+                val time = earliestAvailableTime.toTimelineTime()
+
+                if((range.startTime.isBefore(time)&& range.endTime.isAfter(time)) ||
+                    range.startTime == time){
+                    earliestAvailableTime = earliestAvailableTime.plusMinutes(30)
+                    isSelectable = false
+                    break
+                }
+            }
+            if (isSelectable) return earliestAvailableTime
+
+        } while(startPoint != earliestAvailableTime)
+
+        return LocalTime.of(8,0)
 
     }
 
