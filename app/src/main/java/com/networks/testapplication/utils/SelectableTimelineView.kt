@@ -168,7 +168,7 @@ class SelectableTimelineView @JvmOverloads constructor(context: Context,
     private fun getApproximatedTime(intervalIncrement:Int, time: TimelineTime):TimelineTime{
 
         val approximatedHour =
-            time.hour + if (time.minute + intervalIncrement > 60) 1 else 0
+            time.hour + if (time.minute + intervalIncrement > 59) 1 else 0
         val approximatedMinute =
             (time.minute + (intervalIncrement - time.minute % intervalIncrement)) % 60
         return TimelineTime(approximatedHour,approximatedMinute)
@@ -186,9 +186,9 @@ class SelectableTimelineView @JvmOverloads constructor(context: Context,
 
         val startPoint = getApproximatedTime(30, LocalTime.now().toTimelineTime()).toLocalTime()
 
-        var defaultTime = getEarliestAvailableRange(startPoint, unselectableRanges)
+        var defaultTime = getEarliestAvailableRange(startPoint, unselectableRanges,60)
 
-        var endTime = defaultTime.plusMinutes(30).toTimelineTime()
+        var endTime = defaultTime.plusMinutes(60).toTimelineTime()
 
         if(defaultTime.hour>endTime.hour) endTime = TimelineTime(24,0)
 
@@ -196,17 +196,19 @@ class SelectableTimelineView @JvmOverloads constructor(context: Context,
 
     }
 
-    private fun getEarliestAvailableRange(startPoint: LocalTime, unselectableRanges: List<TimelineRange>): LocalTime{
+    private fun getEarliestAvailableRange(startPoint: LocalTime, unselectableRanges: List<TimelineRange>, timeInterval:Long=30): LocalTime{
 
         var earliestAvailableTime = startPoint
 
         do {
             var isSelectable = true
             for (range in unselectableRanges) {
-                val time = earliestAvailableTime.toTimelineTime()
+                val startTime = earliestAvailableTime.toTimelineTime()
+                val endTime = earliestAvailableTime.plusMinutes(timeInterval).toTimelineTime()
 
-                if((range.startTime.isBefore(time)&& range.endTime.isAfter(time)) ||
-                    range.startTime == time){
+                if((range.startTime.isBefore(startTime)&& range.endTime.isAfter(startTime)) ||
+                    range.startTime == startTime || (range.startTime.isBefore(endTime)&& range.endTime.isAfter(endTime)) ||
+                        range.endTime == endTime){
                     earliestAvailableTime = earliestAvailableTime.plusMinutes(30)
                     isSelectable = false
                     break
